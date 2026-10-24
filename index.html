@@ -243,7 +243,6 @@
           const { data, error } = await supabaseClient.from('app_data').select('*');
           if (error) {
             console.error("Error Supabase:", error);
-            showToast('Error de permisos en Supabase (Revisa RLS)', 'info');
             return;
           }
           if (data && data.length > 0) {
