@@ -336,7 +336,6 @@
         }
       };
 
-      // VERIFICACIONES DE PERMISOS
       const isSuperAdmin = currentUser?.role === 'Super Administrador';
       const isEditor = currentUser?.role === 'Editor de Contenido';
 
@@ -352,7 +351,6 @@
           return;
         }
 
-        // Si es admin normal, no puede asignar rol de Administrador o Super Administrador
         if (!isSuperAdmin && userFormData.role !== 'Editor de Contenido') {
           showToast('Solo el Super Administrador puede crear administradores', 'info');
           return;
@@ -360,7 +358,6 @@
 
         let updatedUsers;
         if (userEditModal && userEditModal !== 'create') {
-          // Seguridad: admin normal no puede editar a otro admin
           if (!isSuperAdmin && userEditModal.role !== 'Editor de Contenido') {
             showToast('No tienes permisos para modificar a este administrador', 'info');
             return;
@@ -396,12 +393,10 @@
           showToast('Los editores no pueden eliminar usuarios', 'info');
           return;
         }
-        // Autoeliminación prohibida
         if (targetUser.id === currentUser.id) {
           showToast('No puedes eliminarte a ti mismo', 'info');
           return;
         }
-        // Admin normal no puede eliminar a otros admins
         if (!isSuperAdmin && targetUser.role !== 'Editor de Contenido') {
           showToast('No puedes eliminar a un administrador', 'info');
           return;
@@ -809,67 +804,96 @@
             </div>
           )}
 
-          {/* MODAL GESTIÓN DE USUARIOS SEGÚN JERARQUÍA */}
+          {/* MODAL GESTIÓN DE USUARIOS CON DISEÑO DINÁMICO */}
           {showUserMgmtModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-              <div className="bg-purple-950 border border-purple-400/60 rounded-2xl max-w-lg w-full p-6 space-y-4 relative">
-                <button onClick={() => { setShowUserMgmtModal(false); setUserEditModal(null); }} className="absolute top-4 right-4 text-purple-300"><Icon name="x" className="w-4 h-4" /></button>
-                <div className="flex justify-between items-center border-b border-purple-800 pb-3">
+              <div className="bg-[#180d2b] border border-purple-500/50 rounded-2xl max-w-lg w-full p-6 space-y-4 relative shadow-2xl">
+                <button onClick={() => { setShowUserMgmtModal(false); setUserEditModal(null); }} className="absolute top-4 right-4 text-purple-300 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
+                
+                <div className="flex justify-between items-center border-b border-purple-800/70 pb-3">
                   <h3 className="text-base font-black text-white">Gestión de Usuarios</h3>
                   {!isEditor && (
-                    <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">+ Crear Usuario</button>
+                    <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md transition">+ Crear Usuario</button>
                   )}
                 </div>
 
+                {/* MODAL / FORMULARIO DE EDICIÓN O CREACIÓN */}
                 {userEditModal !== null && !isEditor && (
-                  <form onSubmit={handleSaveUser} className="bg-slate-900 p-3 rounded-xl space-y-2 text-xs">
-                    <div className="grid grid-cols-2 gap-2">
-                      <input type="text" placeholder="Usuario" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="bg-purple-950 border border-purple-700 rounded p-2 text-white" />
-                      <input type="text" placeholder="Contraseña" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="bg-purple-950 border border-purple-700 rounded p-2 text-white font-mono" />
-                    </div>
-                    {isSuperAdmin && (
-                      <div>
-                        <label className="block text-purple-200 font-bold mb-1">Rol / Permisos</label>
-                        <select value={userFormData.role} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-purple-950 border border-purple-700 rounded p-2 text-white">
-                          <option value="Super Administrador">Super Administrador</option>
-                          <option value="Administrador">Administrador</option>
-                          <option value="Editor de Contenido">Editor de Contenido</option>
-                        </select>
+                  <div className="bg-[#110822] border border-purple-600/40 p-4 rounded-xl space-y-3 text-xs">
+                    <form onSubmit={handleSaveUser} className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="block text-[11px] font-bold text-purple-200">Usuario</label>
+                          <input type="text" placeholder="Usuario" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="w-full bg-[#23123d] border border-purple-500/60 rounded-xl p-2.5 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-[11px] font-bold text-purple-200">Contraseña</label>
+                          <input type="text" placeholder="Contraseña" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="w-full bg-[#23123d] border border-purple-500/60 rounded-xl p-2.5 text-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-400" />
+                        </div>
                       </div>
-                    )}
-                    <div className="flex justify-end gap-2 pt-1">
-                      <button type="button" onClick={() => setUserEditModal(null)} className="px-3 py-1.5 bg-slate-800 text-white rounded">Cancelar</button>
-                      <button type="submit" className="px-3 py-1.5 bg-emerald-600 text-white font-bold rounded">Guardar Usuario</button>
-                    </div>
-                  </form>
+
+                      <div className="space-y-1">
+                        <label className="block text-[11px] font-bold text-purple-200">Rol / Permisos</label>
+                        {isSuperAdmin ? (
+                          <div className="relative">
+                            <select value={userFormData.role} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-[#23123d] border border-purple-500/60 rounded-xl p-2.5 text-white font-semibold appearance-none focus:outline-none focus:ring-2 focus:ring-purple-400">
+                              <option value="Super Administrador">Super Administrador</option>
+                              <option value="Administrador">Administrador</option>
+                              <option value="Editor de Contenido">Editor de Contenido</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-purple-300">
+                              <Icon name="chevron-down" className="w-4 h-4" />
+                            </div>
+                          </div>
+                        ) : (
+                          // Diseño dinámico exacto cuando es Admin normal editando un usuario protegido o admin
+                          <div>
+                            <div className="relative">
+                              <select disabled value={userFormData.role} className="w-full bg-[#23123d]/80 border border-amber-500/50 rounded-xl p-2.5 text-amber-200 font-semibold appearance-none cursor-not-allowed opacity-90">
+                                <option value={userFormData.role}>{userFormData.role}</option>
+                              </select>
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-amber-300">
+                                <Icon name="chevron-down" className="w-4 h-4" />
+                              </div>
+                            </div>
+                            <p className="text-[11px] font-bold text-amber-400 mt-1">No tienes acceso a modificar este permiso</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-2">
+                        <button type="button" onClick={() => setUserEditModal(null)} className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl transition">Cancelar</button>
+                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg transition">Guardar Usuario</button>
+                      </div>
+                    </form>
+                  </div>
                 )}
 
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                {/* LISTA DE USUARIOS */}
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                   {adminUsers.map((usr) => {
                     const isTargetAdminOrSuper = usr.role === 'Administrador' || usr.role === 'Super Administrador';
-                    // Regla de visualización de contraseña:
-                    // - Super admin ve todas
-                    // - Admin normal solo ve contraseñas de editores (a otros admins se les censura)
-                    // - Editor no ve ninguna contraseña
                     const canSeePassword = isSuperAdmin || (!isTargetAdminOrSuper && !isEditor);
                     const displayPassword = canSeePassword ? usr.password : '••••••••';
-
-                    // Regla de permisos de edición/eliminación:
-                    // - Editores no pueden tocar nada
-                    // - Admins normales no pueden tocar a otros admins ni a sí mismos
                     const canModify = !isEditor && (isSuperAdmin ? usr.id !== currentUser.id : !isTargetAdminOrSuper);
 
                     return (
-                      <div key={usr.id} className="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-purple-800 text-xs">
+                      <div key={usr.id} className="flex justify-between items-center p-3 bg-[#110822] rounded-xl border border-purple-800/60 hover:border-purple-600/80 transition text-xs shadow-md">
                         <div>
-                          <span className="font-bold text-white">{usr.username}</span> 
-                          <span className="text-purple-300 font-mono ml-2">[{usr.role}]</span>
-                          <div className="text-[11px] text-purple-400 font-mono mt-0.5">Pass: {displayPassword}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-sm">{usr.username}</span> 
+                            <span className="text-[11px] bg-purple-900/60 text-purple-300 px-2 py-0.5 rounded-full border border-purple-700/50 font-mono">[{usr.role}]</span>
+                          </div>
+                          <div className="text-[11px] text-purple-400/80 font-mono mt-1">Pass: {displayPassword}</div>
                         </div>
                         {canModify && (
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-1.5 bg-purple-800 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                            <button onClick={() => handleDeleteUser(usr)} className="p-1.5 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <div className="flex items-center gap-1.5">
+                            <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-2 bg-purple-800 hover:bg-purple-700 text-white rounded-lg shadow transition" title="Editar usuario">
+                              <Icon name="edit-3" className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => handleDeleteUser(usr)} className="p-2 bg-red-900/80 hover:bg-red-800 text-white rounded-lg shadow transition" title="Eliminar usuario">
+                              <Icon name="trash-2" className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         )}
                       </div>
