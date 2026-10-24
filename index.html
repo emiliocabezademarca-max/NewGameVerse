@@ -242,8 +242,7 @@
         try {
           const { data, error } = await supabaseClient.from('app_data').select('*');
           if (error) {
-            console.error("Error al leer Supabase:", error);
-            showToast('Error de conexión con la nube', 'info');
+            console.error("Error Supabase:", error);
             return;
           }
           if (data && data.length > 0) {
@@ -257,9 +256,9 @@
               if (row.key === 'ngv_bg' && row.payload) setBugsData(row.payload);
               if (row.key === 'ngv_cu' && row.payload) setCuriositiesData(row.payload);
             });
-            showToast('¡Sincronizado correctamente!');
+            showToast('¡Sincronizado con la nube!');
           } else {
-            // Si la tabla está vacía, sembramos los datos iniciales
+            // Sembramos los datos iniciales de forma silenciosa
             await persistData('ngv_u', INITIAL_ADMIN_USERS, false);
             await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, false);
             await persistData('ngv_h', INITIAL_HERO, false);
