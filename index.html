@@ -336,18 +336,38 @@
         }
       };
 
+      // VERIFICACIONES DE PERMISOS
+      const isSuperAdmin = currentUser?.role === 'Super Administrador';
+      const isEditor = currentUser?.role === 'Editor de Contenido';
+
       const handleSaveUser = (e) => {
         e.preventDefault();
+        if (isEditor) {
+          showToast('Los editores no pueden modificar usuarios', 'info');
+          return;
+        }
+
         if (!userFormData.username.trim() || !userFormData.password.trim()) {
           showToast('Usuario y contraseña requeridos', 'info');
           return;
         }
 
+        // Si es admin normal, no puede asignar rol de Administrador o Super Administrador
+        if (!isSuperAdmin && userFormData.role !== 'Editor de Contenido') {
+          showToast('Solo el Super Administrador puede crear administradores', 'info');
+          return;
+        }
+
         let updatedUsers;
         if (userEditModal && userEditModal !== 'create') {
+          // Seguridad: admin normal no puede editar a otro admin
+          if (!isSuperAdmin && userEditModal.role !== 'Editor de Contenido') {
+            showToast('No tienes permisos para modificar a este administrador', 'info');
+            return;
+          }
           updatedUsers = adminUsers.map((u) =>
             u.id === userEditModal.id
-              ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: userFormData.role }
+              ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : u.role }
               : u
           );
         } else {
@@ -360,7 +380,7 @@
             id: `usr-${Date.now()}`,
             username: userFormData.username.trim(),
             password: userFormData.password,
-            role: userFormData.role || 'Editor de Contenido'
+            role: isSuperAdmin ? (userFormData.role || 'Editor de Contenido') : 'Editor de Contenido'
           };
           updatedUsers = [...adminUsers, newUser];
         }
@@ -371,14 +391,30 @@
         setUserFormData({ username: '', password: '', role: 'Editor de Contenido' });
       };
 
-      const handleDeleteUser = (userId) => {
-        if (adminUsers.length <= 1) {
-          showToast('No puedes eliminar el único administrador', 'info');
+      const handleDeleteUser = (targetUser) => {
+        if (isEditor) {
+          showToast('Los editores no pueden eliminar usuarios', 'info');
           return;
         }
-        const updatedUsers = adminUsers.filter((u) => u.id !== userId);
+        // Autoeliminación prohibida
+        if (targetUser.id === currentUser.id) {
+          showToast('No puedes eliminarte a ti mismo', 'info');
+          return;
+        }
+        // Admin normal no puede eliminar a otros admins
+        if (!isSuperAdmin && targetUser.role !== 'Editor de Contenido') {
+          showToast('No puedes eliminar a un administrador', 'info');
+          return;
+        }
+        if (adminUsers.length <= 1) {
+          showToast('No puedes eliminar el único usuario', 'info');
+          return;
+        }
+
+        const updatedUsers = adminUsers.filter((u) => u.id !== targetUser.id);
         setAdminUsers(updatedUsers);
         persistData('ngv_u', updatedUsers);
+        showToast('Usuario eliminado', 'info');
       };
 
       const openEditor = (category, item = null) => {
@@ -504,7 +540,7 @@
             <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 border-b border-purple-400/40 py-1.5 px-4 sticky top-0 z-50 text-xs flex items-center justify-between shadow-lg">
               <div className="flex items-center gap-2 text-purple-200">
                 <Icon name="shield-check" className="w-4 h-4 text-emerald-400 animate-pulse" />
-                <span className="font-bold text-white">Sesión Admin: <span className="text-purple-300 font-mono">{currentUser?.username || 'OsitoP3k'}</span></span>
+                <span className="font-bold text-white">Sesión Admin: <span className="text-purple-300 font-mono">{currentUser?.username} ({currentUser?.role})</span></span>
               </div>
               <div className="flex items-center gap-2">
                 <button 
@@ -518,9 +554,11 @@
                 <button onClick={() => setShowUserMgmtModal(true)} className="flex items-center gap-1 bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded border border-indigo-400/50 text-[11px] font-bold">
                   <Icon name="users" className="w-3.5 h-3.5" /> Usuarios
                 </button>
-                <button onClick={() => setShowMediaSettingsModal(true)} className="flex items-center gap-1 bg-violet-700 hover:bg-violet-600 text-white px-2.5 py-1 rounded border border-violet-400/50 text-[11px] font-bold">
-                  <Icon name="video" className="w-3 h-3" /> Video & Redes
-                </button>
+                {isSuperAdmin && (
+                  <button onClick={() => setShowMediaSettingsModal(true)} className="flex items-center gap-1 bg-violet-700 hover:bg-violet-600 text-white px-2.5 py-1 rounded border border-violet-400/50 text-[11px] font-bold">
+                    <Icon name="video" className="w-3 h-3" /> Video & Redes
+                  </button>
+                )}
                 <button onClick={() => { setIsAdmin(false); setCurrentUser(null); showToast('Sesión cerrada', 'info'); }} className="flex items-center gap-1 bg-red-900/80 hover:bg-red-800 text-red-100 px-2.5 py-1 rounded border border-red-400/40 text-[11px]">
                   <Icon name="log-out" className="w-3 h-3" /> Salir
                 </button>
@@ -599,7 +637,7 @@
                 <section className="bg-purple-950/40 border border-purple-500/30 rounded-2xl p-6 shadow-2xl space-y-6">
                   <div className="flex justify-between items-center border-b border-purple-800/60 pb-4">
                     <h2 className="text-xl font-black text-white">{mediaSettings.videoTitle}</h2>
-                    {isAdmin && <button onClick={() => setShowMediaSettingsModal(true)} className="bg-purple-800 text-white text-xs font-bold px-3 py-2 rounded-xl">Cambiar Video & Redes</button>}
+                    {isSuperAdmin && <button onClick={() => setShowMediaSettingsModal(true)} className="bg-purple-800 text-white text-xs font-bold px-3 py-2 rounded-xl">Cambiar Video & Redes</button>}
                   </div>
                   <div className="relative w-full rounded-xl overflow-hidden aspect-video bg-slate-950">
                     <iframe src={getEmbedVideoUrl(mediaSettings.videoUrl)} className="w-full h-full border-0" allowFullScreen />
@@ -750,7 +788,7 @@
           </main>
 
           {/* MODAL CONFIGURACIÓN VIDEO & REDES SOCIALES */}
-          {showMediaSettingsModal && (
+          {showMediaSettingsModal && isSuperAdmin && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
               <div className="bg-purple-950 border border-purple-400/60 rounded-2xl max-w-lg w-full p-6 space-y-4 relative">
                 <button onClick={() => setShowMediaSettingsModal(false)} className="absolute top-4 right-4 text-purple-300"><Icon name="x" className="w-4 h-4" /></button>
@@ -771,30 +809,34 @@
             </div>
           )}
 
-          {/* MODAL GESTIÓN DE USUARIOS RESTAURADA */}
+          {/* MODAL GESTIÓN DE USUARIOS SEGÚN JERARQUÍA */}
           {showUserMgmtModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
               <div className="bg-purple-950 border border-purple-400/60 rounded-2xl max-w-lg w-full p-6 space-y-4 relative">
                 <button onClick={() => { setShowUserMgmtModal(false); setUserEditModal(null); }} className="absolute top-4 right-4 text-purple-300"><Icon name="x" className="w-4 h-4" /></button>
                 <div className="flex justify-between items-center border-b border-purple-800 pb-3">
                   <h3 className="text-base font-black text-white">Gestión de Usuarios</h3>
-                  <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">+ Crear Usuario</button>
+                  {!isEditor && (
+                    <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">+ Crear Usuario</button>
+                  )}
                 </div>
 
-                {userEditModal !== null && (
+                {userEditModal !== null && !isEditor && (
                   <form onSubmit={handleSaveUser} className="bg-slate-900 p-3 rounded-xl space-y-2 text-xs">
                     <div className="grid grid-cols-2 gap-2">
                       <input type="text" placeholder="Usuario" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="bg-purple-950 border border-purple-700 rounded p-2 text-white" />
                       <input type="text" placeholder="Contraseña" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="bg-purple-950 border border-purple-700 rounded p-2 text-white font-mono" />
                     </div>
-                    <div>
-                      <label className="block text-purple-200 font-bold mb-1">Rol / Permisos</label>
-                      <select value={userFormData.role} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-purple-950 border border-purple-700 rounded p-2 text-white">
-                        <option value="Super Administrador">Super Administrador</option>
-                        <option value="Administrador">Administrador</option>
-                        <option value="Editor de Contenido">Editor de Contenido</option>
-                      </select>
-                    </div>
+                    {isSuperAdmin && (
+                      <div>
+                        <label className="block text-purple-200 font-bold mb-1">Rol / Permisos</label>
+                        <select value={userFormData.role} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-purple-950 border border-purple-700 rounded p-2 text-white">
+                          <option value="Super Administrador">Super Administrador</option>
+                          <option value="Administrador">Administrador</option>
+                          <option value="Editor de Contenido">Editor de Contenido</option>
+                        </select>
+                      </div>
+                    )}
                     <div className="flex justify-end gap-2 pt-1">
                       <button type="button" onClick={() => setUserEditModal(null)} className="px-3 py-1.5 bg-slate-800 text-white rounded">Cancelar</button>
                       <button type="submit" className="px-3 py-1.5 bg-emerald-600 text-white font-bold rounded">Guardar Usuario</button>
@@ -803,19 +845,36 @@
                 )}
 
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {adminUsers.map((usr) => (
-                    <div key={usr.id} className="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-purple-800 text-xs">
-                      <div>
-                        <span className="font-bold text-white">{usr.username}</span> 
-                        <span className="text-purple-300 font-mono ml-2">[{usr.role}]</span>
-                        <div className="text-[11px] text-purple-400 font-mono mt-0.5">Pass: {usr.password}</div>
+                  {adminUsers.map((usr) => {
+                    const isTargetAdminOrSuper = usr.role === 'Administrador' || usr.role === 'Super Administrador';
+                    // Regla de visualización de contraseña:
+                    // - Super admin ve todas
+                    // - Admin normal solo ve contraseñas de editores (a otros admins se les censura)
+                    // - Editor no ve ninguna contraseña
+                    const canSeePassword = isSuperAdmin || (!isTargetAdminOrSuper && !isEditor);
+                    const displayPassword = canSeePassword ? usr.password : '••••••••';
+
+                    // Regla de permisos de edición/eliminación:
+                    // - Editores no pueden tocar nada
+                    // - Admins normales no pueden tocar a otros admins ni a sí mismos
+                    const canModify = !isEditor && (isSuperAdmin ? usr.id !== currentUser.id : !isTargetAdminOrSuper);
+
+                    return (
+                      <div key={usr.id} className="flex justify-between items-center p-2.5 bg-slate-900 rounded-xl border border-purple-800 text-xs">
+                        <div>
+                          <span className="font-bold text-white">{usr.username}</span> 
+                          <span className="text-purple-300 font-mono ml-2">[{usr.role}]</span>
+                          <div className="text-[11px] text-purple-400 font-mono mt-0.5">Pass: {displayPassword}</div>
+                        </div>
+                        {canModify && (
+                          <div className="flex items-center gap-1">
+                            <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-1.5 bg-purple-800 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => handleDeleteUser(usr)} className="p-1.5 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-1.5 bg-purple-800 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDeleteUser(usr.id)} className="p-1.5 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
