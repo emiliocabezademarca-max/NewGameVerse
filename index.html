@@ -221,8 +221,8 @@
       const [loginPassword, setLoginPassword] = useState('');
       const [authError, setAuthError] = useState('');
       const [toast, setToast] = useState(null);
+      const [isSyncing, setIsSyncing] = useState(false);
 
-      // ESTADOS INICIALES
       const [adminUsers, setAdminUsers] = useState(INITIAL_ADMIN_USERS);
       const [mediaSettings, setMediaSettings] = useState(INITIAL_MEDIA_SETTINGS);
       const [heroData, setHeroData] = useState(INITIAL_HERO);
@@ -237,10 +237,15 @@
       const [editorModal, setEditorModal] = useState(null);
       const [formData, setFormData] = useState({});
 
-      // CARGA DIRECTA DESDE SUPABASE AL ABRIR LA PÁGINA
       const fetchCloudData = async () => {
+        setIsSyncing(true);
         try {
           const { data, error } = await supabaseClient.from('app_data').select('*');
+          if (error) {
+            console.error("Error Supabase:", error);
+            showToast('Error de permisos en Supabase (Revisa RLS)', 'info');
+            return;
+          }
           if (data && data.length > 0) {
             data.forEach(row => {
               if (row.key === 'ngv_u' && row.payload) setAdminUsers(row.payload);
@@ -252,10 +257,15 @@
               if (row.key === 'ngv_bg' && row.payload) setBugsData(row.payload);
               if (row.key === 'ngv_cu' && row.payload) setCuriositiesData(row.payload);
             });
-            showToast('¡Sincronizado con la nube!');
+            showToast('¡Sincronizado con Supabase!');
+          } else {
+            showToast('La tabla en Supabase está vacía', 'info');
           }
         } catch (e) {
-          console.error("Error al sincronizar:", e);
+          console.error("Excepción:", e);
+          showToast('Error de conexión', 'info');
+        } finally {
+          setIsSyncing(false);
         }
       };
 
@@ -263,13 +273,14 @@
         fetchCloudData();
       }, []);
 
-      // GUARDADO ROBUSTO CON SUPABASE (DELETE + INSERT PARA EVITAR ERRORES DE UPSERT)
       const persistData = async (key, data, setter) => {
         setter(data);
         try {
-          await supabaseClient.from('app_data').delete().eq('key', key);
-          const { error } = await supabaseClient.from('app_data').insert({ key, payload: data, updated_at: new Date() });
-          if (error) console.error("Error al guardar en Supabase:", error);
+          const { error } = await supabaseClient.from('app_data').upsert({ key, payload: data, updated_at: new Date() });
+          if (error) {
+            console.error("Error al guardar en Supabase:", error);
+            showToast('Error al guardar en Supabase (Verifica RLS)', 'info');
+          }
         } catch (err) {
           console.warn("Cloud save exception:", err);
         }
@@ -277,7 +288,7 @@
 
       const showToast = (message, type = 'success') => {
         setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
+        setTimeout(() => setToast(null), 3500);
       };
 
       useEffect(() => {
@@ -321,7 +332,6 @@
               ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: userFormData.role }
               : u
           );
-          showToast(`Usuario ${userFormData.username} actualizado`);
         } else {
           const exists = adminUsers.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase());
           if (exists) {
@@ -335,7 +345,6 @@
             role: userFormData.role || 'Editor de Contenido'
           };
           updatedUsers = [...adminUsers, newUser];
-          showToast(`Usuario ${newUser.username} creado`);
         }
 
         persistData('ngv_u', updatedUsers, setAdminUsers);
@@ -350,7 +359,6 @@
         }
         const updatedUsers = adminUsers.filter((u) => u.id !== userId);
         persistData('ngv_u', updatedUsers, setAdminUsers);
-        showToast('Usuario eliminado', 'info');
       };
 
       const openEditor = (category, item = null) => {
@@ -382,7 +390,7 @@
         if (category === 'curiosities') persistData('ngv_cu', isEdit ? curiositiesData.map(i => i.id === newId ? payload : i) : [payload, ...curiositiesData], setCuriositiesData);
 
         setEditorModal(null);
-        showToast('Guardado y sincronizado en la nube');
+        showToast('Guardado y enviado a Supabase');
       };
 
       const handleDeleteItem = (category, id) => {
@@ -442,8 +450,13 @@
                 <span className="font-bold text-white">Sesión Admin: <span className="text-purple-300 font-mono">{currentUser?.username || 'OsitoP3k'}</span></span>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={fetchCloudData} className="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded border border-emerald-400/50 text-[11px] font-bold cursor-pointer">
-                  <Icon name="refresh-cw" className="w-3.5 h-3.5" /> Sincronizar de la Nube
+                <button 
+                  onClick={fetchCloudData} 
+                  disabled={isSyncing}
+                  className="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded border border-emerald-400/50 text-[11px] font-bold cursor-pointer transition disabled:opacity-50"
+                >
+                  <Icon name="refresh-cw" className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} /> 
+                  {isSyncing ? 'Sincronizando...' : 'Sincronizar de la Nube'}
                 </button>
                 <button onClick={() => setShowUserMgmtModal(true)} className="flex items-center gap-1 bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded border border-indigo-400/50 text-[11px] font-bold">
                   <Icon name="users" className="w-3.5 h-3.5" /> Usuarios
@@ -468,7 +481,7 @@
                 </div>
                 <div>
                   <h1 className="text-lg font-black tracking-wider text-white">NewGame<span className="text-purple-400">Verse</span></h1>
-                  <p className="text-[10px] text-purple-300 font-mono tracking-widest uppercase">Supabase Direct Sync</p>
+                  <p className="text-[10px] text-purple-300 font-mono tracking-widest uppercase">Supabase Realtime</p>
                 </div>
               </div>
 
