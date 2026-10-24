@@ -222,42 +222,40 @@
       const [authError, setAuthError] = useState('');
       const [toast, setToast] = useState(null);
 
-      // ESTADOS HÍBRIDOS (LOCALSTORAGE + SUPABASE)
-      const [adminUsers, setAdminUsers] = useState(() => JSON.parse(localStorage.getItem('ngv_u')) || INITIAL_ADMIN_USERS);
-      const [mediaSettings, setMediaSettings] = useState(() => JSON.parse(localStorage.getItem('ngv_m')) || INITIAL_MEDIA_SETTINGS);
-      const [heroData, setHeroData] = useState(() => JSON.parse(localStorage.getItem('ngv_h')) || INITIAL_HERO);
-      const [updatesData, setUpdatesData] = useState(() => JSON.parse(localStorage.getItem('ngv_up')) || INITIAL_UPDATES);
-      const [betasData, setBetasData] = useState(() => JSON.parse(localStorage.getItem('ngv_b')) || INITIAL_BETAS);
-      const [charactersData, setCharactersData] = useState(() => JSON.parse(localStorage.getItem('ngv_c')) || INITIAL_CHARACTERS);
-      const [bugsData, setBugsData] = useState(() => JSON.parse(localStorage.getItem('ngv_bg')) || INITIAL_BUGS);
-      const [curiositiesData, setCuriositiesData] = useState(() => JSON.parse(localStorage.getItem('ngv_cu')) || INITIAL_CURIOSITIES);
+      // ESTADOS INICIALES
+      const [adminUsers, setAdminUsers] = useState(INITIAL_ADMIN_USERS);
+      const [mediaSettings, setMediaSettings] = useState(INITIAL_MEDIA_SETTINGS);
+      const [heroData, setHeroData] = useState(INITIAL_HERO);
+      const [updatesData, setUpdatesData] = useState(INITIAL_UPDATES);
+      const [betasData, setBetasData] = useState(INITIAL_BETAS);
+      const [charactersData, setCharactersData] = useState(INITIAL_CHARACTERS);
+      const [bugsData, setBugsData] = useState(INITIAL_BUGS);
+      const [curiositiesData, setCuriositiesData] = useState(INITIAL_CURIOSITIES);
 
       const [userEditModal, setUserEditModal] = useState(null);
       const [userFormData, setUserFormData] = useState({ username: '', password: '', role: 'Editor de Contenido' });
       const [editorModal, setEditorModal] = useState(null);
       const [formData, setFormData] = useState({});
 
-      // FUNCIÓN DE SINCRONIZACIÓN MANUAL Y AUTOMÁTICA
+      // CARGA DIRECTA DESDE SUPABASE AL ABRIR LA PÁGINA
       const fetchCloudData = async () => {
         try {
           const { data, error } = await supabaseClient.from('app_data').select('*');
           if (data && data.length > 0) {
             data.forEach(row => {
-              if (row.key === 'ngv_u' && row.payload) { setAdminUsers(row.payload); localStorage.setItem('ngv_u', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_m' && row.payload) { setMediaSettings(row.payload); localStorage.setItem('ngv_m', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_h' && row.payload) { setHeroData(row.payload); localStorage.setItem('ngv_h', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_up' && row.payload) { setUpdatesData(row.payload); localStorage.setItem('ngv_up', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_b' && row.payload) { setBetasData(row.payload); localStorage.setItem('ngv_b', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_c' && row.payload) { setCharactersData(row.payload); localStorage.setItem('ngv_c', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_bg' && row.payload) { setBugsData(row.payload); localStorage.setItem('ngv_bg', JSON.stringify(row.payload)); }
-              if (row.key === 'ngv_cu' && row.payload) { setCuriositiesData(row.payload); localStorage.setItem('ngv_cu', JSON.stringify(row.payload)); }
+              if (row.key === 'ngv_u' && row.payload) setAdminUsers(row.payload);
+              if (row.key === 'ngv_m' && row.payload) setMediaSettings(row.payload);
+              if (row.key === 'ngv_h' && row.payload) setHeroData(row.payload);
+              if (row.key === 'ngv_up' && row.payload) setUpdatesData(row.payload);
+              if (row.key === 'ngv_b' && row.payload) setBetasData(row.payload);
+              if (row.key === 'ngv_c' && row.payload) setCharactersData(row.payload);
+              if (row.key === 'ngv_bg' && row.payload) setBugsData(row.payload);
+              if (row.key === 'ngv_cu' && row.payload) setCuriositiesData(row.payload);
             });
-            showToast('¡Sincronizado con la nube exitosamente!');
-          } else {
-            showToast('La nube está vacía, usando datos locales', 'info');
+            showToast('¡Sincronizado con la nube!');
           }
         } catch (e) {
-          showToast('Error al conectar con Supabase', 'info');
+          console.error("Error al sincronizar:", e);
         }
       };
 
@@ -265,13 +263,15 @@
         fetchCloudData();
       }, []);
 
+      // GUARDADO ROBUSTO CON SUPABASE (DELETE + INSERT PARA EVITAR ERRORES DE UPSERT)
       const persistData = async (key, data, setter) => {
         setter(data);
-        localStorage.setItem(key, JSON.stringify(data));
         try {
-          await supabaseClient.from('app_data').upsert({ key, payload: data, updated_at: new Date() });
+          await supabaseClient.from('app_data').delete().eq('key', key);
+          const { error } = await supabaseClient.from('app_data').insert({ key, payload: data, updated_at: new Date() });
+          if (error) console.error("Error al guardar en Supabase:", error);
         } catch (err) {
-          console.warn("Cloud save warning:", err);
+          console.warn("Cloud save exception:", err);
         }
       };
 
@@ -468,7 +468,7 @@
                 </div>
                 <div>
                   <h1 className="text-lg font-black tracking-wider text-white">NewGame<span className="text-purple-400">Verse</span></h1>
-                  <p className="text-[10px] text-purple-300 font-mono tracking-widest uppercase">Hybrid Cloud Sync</p>
+                  <p className="text-[10px] text-purple-300 font-mono tracking-widest uppercase">Supabase Direct Sync</p>
                 </div>
               </div>
 
