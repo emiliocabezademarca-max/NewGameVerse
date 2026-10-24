@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewGameVerse - Portal Gamer Dinámico</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <!-- Babel compiler para procesar JSX en vivo -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans selection:bg-purple-600 selection:text-white">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- COMPONENTE AUXILIAR PARA RENDERIZAR ICONOS DE LUCIDE ---
+    const Icon = ({ name, className = "w-4 h-4" }) => {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (window.lucide && ref.current) {
+          window.lucide.createIcons();
+        }
+      }, [name]);
+      return <i ref={ref} data-lucide={name} className={className}></i>;
+    };
+
+    // --- ICONOS CUSTOM SVG ---
+    const DiscordIcon = ({ className = "w-6 h-6" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+      </svg>
+    );
+
+    const InstagramIcon = ({ className = "w-6 h-6" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+    );
+
+    const TikTokIcon = ({ className = "w-6 h-6" }) => (
+      <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.82.12V9.4a6.33 6.33 0 0 0-1-.08A6.26 6.26 0 0 0 3 15.57a6.26 6.26 0 0 0 10.68 4.43V12.1a8.23 8.23 0 0 0 5.91 2.38v-3.46a4.85 4.85 0 0 1-3.23-1.38z"/>
+      </svg>
+    );
+
+    // --- BACKGROUND BUBBLE PHYSICS CANVAS ---
+    const BubbleCanvas = () => {
+      const canvasRef = useRef(null);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
+
+        const handleResize = () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        };
+        window.addEventListener('resize', handleResize);
+
+        const mouse = { x: width / 2, y: height / 2, radius: 180 };
+        const handleMouseMove = (e) => {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+
+        const numBubbles = Math.min(Math.floor(width / 20), 55);
+        const bubbles = [];
+
+        class Bubble {
+          constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.radius = Math.random() * 28 + 8;
+            this.vx = (Math.random() - 0.5) * 0.7;
+            this.vy = (Math.random() - 0.5) * 0.7;
+            this.baseAlpha = Math.random() * 0.4 + 0.25;
+            const colorChoice = Math.random();
+            this.color = colorChoice > 0.5 ? '168, 85, 247' : colorChoice > 0.25 ? '192, 132, 252' : '255, 255, 255';
+            this.pulse = Math.random() * Math.PI * 2;
+          }
+
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < -this.radius) this.x = width + this.radius;
+            if (this.x > width + this.radius) this.x = -this.radius;
+            if (this.y < -this.radius) this.y = height + this.radius;
+            if (this.y > height + this.radius) this.y = -this.radius;
+
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < mouse.radius) {
+              const force = (mouse.radius - distance) / mouse.radius;
+              this.x -= (dx / distance) * force * 3;
+              this.y -= (dy / distance) * force * 3;
+            }
+            this.pulse += 0.03;
+          }
+
+          draw() {
+            ctx.beginPath();
+            const currentRadius = Math.max(2, this.radius + Math.sin(this.pulse) * 2.5);
+            const gradient = ctx.createRadialGradient(
+              this.x - currentRadius * 0.3, this.y - currentRadius * 0.3, currentRadius * 0.1,
+              this.x, this.y, currentRadius
+            );
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${this.baseAlpha + 0.35})`);
+            gradient.addColorStop(0.6, `rgba(${this.color}, ${this.baseAlpha})`);
+            gradient.addColorStop(1, `rgba(${this.color}, 0)`);
+            ctx.fillStyle = gradient;
+            ctx.arc(this.x, this.y, currentRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, currentRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${this.baseAlpha * 0.6})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        for (let i = 0; i < numBubbles; i++) bubbles.push(new Bubble());
+
+        const render = () => {
+          ctx.clearRect(0, 0, width, height);
+
+          for (let i = 0; i < bubbles.length; i++) {
+            for (let j = i + 1; j < bubbles.length; j++) {
+              const dx = bubbles[i].x - bubbles[j].x;
+              const dy = bubbles[i].y - bubbles[j].y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 120) {
+                ctx.beginPath();
+                ctx.moveTo(bubbles[i].x, bubbles[i].y);
+                ctx.lineTo(bubbles[j].x, bubbles[j].y);
+                ctx.strokeStyle = `rgba(192, 132, 252, ${0.18 * (1 - dist / 120)})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+              }
+            }
+          }
+
+          bubbles.forEach((b) => { b.update(); b.draw(); });
+          animationFrameId = requestAnimationFrame(render);
+        };
+        render();
+
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          window.removeEventListener('mousemove', handleMouseMove);
+          cancelAnimationFrame(animationFrameId);
+        };
+      }, []);
+
+      return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-80" />;
+    };
+
+    // --- DATOS POR DEFECTO DEL TSX ORIGINAL ---
+    const INITIAL_MEDIA_SETTINGS = {
+      videoTitle: 'Trailer Oficial de Temporada - NewGameVerse 2026',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0',
+      discordUrl: 'https://discord.gg',
+      instagramUrl: 'https://instagram.com',
+      tiktokUrl: 'https://tiktok.com'
+    };
+
+    const INITIAL_HERO = [
+      {
+        id: 'hero-1',
+        title: 'Aetheria Legends: Actualización "Reino de Éter"',
+        category: 'Súper Update',
+        game: 'Aetheria Legends',
+        date: 'Hace 1 hora',
+        image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
+        tag: 'Parche 4.0',
+        badgeColor: 'bg-purple-600 text-white',
+        description: 'Explora el nuevo continente flotante con físicas de gravedad variable, 3 nuevos jefes de raid y rebalance integral para todas las clases elementales.'
+      },
+      {
+        id: 'hero-2',
+        title: 'Cyber-Chrono 2088: Registro de Alpha Abierta',
+        category: 'Alpha Test',
+        game: 'Cyber-Chrono 2088',
+        date: 'Hace 3 horas',
+        image: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1200&q=80',
+        tag: 'Acceso Gratuito',
+        badgeColor: 'bg-violet-600 text-white',
+        description: 'Pone a prueba el motor de destrucción de mapas y el sistema de combate cyberpunk táctico en línea.'
+      }
+    ];
+
+    const INITIAL_BETAS = [
+      {
+        id: 'ba-1',
+        title: 'Valiant Realms: Rebirth',
+        type: 'Beta Abierta',
+        status: 'Disponible Ahora',
+        platforms: 'PC, PS5, Xbox Series X',
+        developer: 'Aether Studios',
+        dates: '24 Oct - 10 Nov',
+        description: 'MMORPG de fantasía medieval con combates de más de 200 jugadores simultáneos sin caídas de framerate.'
+      },
+      {
+        id: 'ba-2',
+        title: 'Neon Bloodline 2099',
+        type: 'Alpha Técnica',
+        status: 'En Selección',
+        platforms: 'PC (Steam)',
+        developer: 'CyberCraft Games',
+        dates: 'Nov 01 - Nov 05',
+        description: 'Shooter táctico PvP en primera persona enfocado en manipulación de tiempo y hackeo de entorno.'
+      }
+    ];
+
+    const INITIAL_CHARACTERS = [
+      {
+        id: 'c-1',
+        name: 'Lyra Vance',
+        title: 'La Caminante del Vacío',
+        game: 'Aetheria Legends',
+        role: 'Asesina Sigilosa',
+        avatar: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+        lore: 'Capaz de alterar su densidad molecular para atravesar paredes y emboscar desde las sombras interdimensionales.',
+        stats: [
+          { name: 'Ataque', value: 95 },
+          { name: 'Agilidad', value: 98 },
+          { name: 'Control', value: 65 }
+        ],
+        difficulty: 'Alta'
+      },
+      {
+        id: 'c-2',
+        name: 'Kaelen Thorne',
+        title: 'Baluarte de Titanio',
+        game: 'Vortex Protocol',
+        role: 'Tanque Biomecánico',
+        avatar: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=600&q=80',
+        lore: 'Reconstruido con nanotecnología militar que convierte el impacto recibido en escudos energéticos de área.',
+        stats: [
+          { name: 'Ataque', value: 60 },
+          { name: 'Agilidad', value: 40 },
+          { name: 'Control', value: 95 }
+        ],
+        difficulty: 'Media'
+      }
+    ];
+
+    const INITIAL_UPDATES = [
+      {
+        id: 'u-1',
+        game: 'Aetheria Legends',
+        version: 'v4.0.2',
+        date: 'Hace 2 horas',
+        title: 'Parche de Rebalanceo de Magia de Sombras',
+        items: 'Reducción del enfriamiento de habilidad especial en 15%.\nCorrección de tasa de refresco en monitores ultrawide.\nMejora de rendimiento en zonas con vegetación.'
+      },
+      {
+        id: 'u-2',
+        game: 'Vortex Protocol',
+        version: 'v1.8.5',
+        date: 'Ayer',
+        title: 'Hotfix Emergente de Servidores Clasificatorios',
+        items: 'Solucionado el bug de desincronización de cajas de colisión al esquivar.\nAumento de recompensa de experiencia (+20%).'
+      }
+    ];
+
+    const INITIAL_BUGS = [
+      {
+        id: 'b-1',
+        game: 'Vortex Protocol',
+        bug: 'Vuelo Infinito al Usar Inventario + Salto Simultáneo',
+        status: 'RESUELTO',
+        severity: 'Crítica',
+        fix: 'Se aplicó una validación estricta de vector de velocidad vertical en el servidor.'
+      },
+      {
+        id: 'b-2',
+        game: 'Cyber-Chrono 2088',
+        bug: 'Parpadeo de Texturas en Luces de Neón Nocturnas',
+        status: 'SOLUCIONADO',
+        severity: 'Media',
+        fix: 'Actualización del shader de oclusión ambiental y trazado de rayos.'
+      }
+    ];
+
+    const INITIAL_CURIOSITIES = [
+      {
+        id: 'cur-1',
+        icon: '🎵',
+        title: 'Canción Oculta en el Menú',
+        game: 'Cyber-Chrono 2088',
+        detail: 'Al dejar el cursor inmóvil durante 5 minutos en el menú de pausa, suena una versión orquestada del primer videojuego retro de la desarrolladora.',
+        likes: 142
+      },
+      {
+        id: 'cur-2',
+        icon: '👾',
+        title: 'El Glitch que se Volvió Habilidad',
+        game: 'Aetheria Legends',
+        detail: 'El doble salto del personaje "Lyra" comenzó siendo un error de física, pero a los probadores les gustó tanto que fue integrado formalmente.',
+        likes: 289
+      }
+    ];
+
+    const INITIAL_ADMIN_USERS = [
+      {
+        id: 'usr-1',
+        username: 'OsitoP3k',
+        password: 'Emi1307',
+        role: 'Super Administrador',
+        createdAt: '2026-10-23'
+      }
+    ];
+
+    // --- COMPONENTE PRINCIPAL ---
+    function App() {
+      const [activeTab, setActiveTab] = useState('all');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [heroIdx, setHeroIdx] = useState(0);
+      const [selectedModal, setSelectedModal] = useState(null);
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      // ESTADO ADMIN Y AUTENTICACIÓN
+      const [isAdmin, setIsAdmin] = useState(false);
+      const [currentUser, setCurrentUser] = useState(null);
+      const [showLoginModal, setShowLoginModal] = useState(false);
+      const [showUserMgmtModal, setShowUserMgmtModal] = useState(false);
+      const [showMediaSettingsModal, setShowMediaSettingsModal] = useState(false);
+      
+      const [loginUsername, setLoginUsername] = useState('');
+      const [loginPassword, setLoginPassword] = useState('');
+      const [authError, setAuthError] = useState('');
+      const [toast, setToast] = useState(null);
+
+      const [adminUsers, setAdminUsers] = useState(() => {
+        const saved = localStorage.getItem('ngv_admin_users');
+        return saved ? JSON.parse(saved) : INITIAL_ADMIN_USERS;
+      });
+      const [userEditModal, setUserEditModal] = useState(null);
+      const [userFormData, setUserFormData] = useState({ username: '', password: '', role: 'Editor de Contenido' });
+
+      const [editorModal, setEditorModal] = useState(null);
+      const [formData, setFormData] = useState({});
+
+      const [mediaSettings, setMediaSettings] = useState(() => {
+        const saved = localStorage.getItem('ngv_media');
+        return saved ? JSON.parse(saved) : INITIAL_MEDIA_SETTINGS;
+      });
+
+      const [heroData, setHeroData] = useState(() => {
+        const saved = localStorage.getItem('ngv_hero');
+        return saved ? JSON.parse(saved) : INITIAL_HERO;
+      });
+
+      const [updatesData, setUpdatesData] = useState(() => {
+        const saved = localStorage.getItem('ngv_updates');
+        return saved ? JSON.parse(saved) : INITIAL_UPDATES;
+      });
+
+      const [betasData, setBetasData] = useState(() => {
+        const saved = localStorage.getItem('ngv_betas');
+        return saved ? JSON.parse(saved) : INITIAL_BETAS;
+      });
+
+      const [charactersData, setCharactersData] = useState(() => {
+        const saved = localStorage.getItem('ngv_characters');
+        return saved ? JSON.parse(saved) : INITIAL_CHARACTERS;
+      });
+
+      const [bugsData, setBugsData] = useState(() => {
+        const saved = localStorage.getItem('ngv_bugs');
+        return saved ? JSON.parse(saved) : INITIAL_BUGS;
+      });
+
+      const [curiositiesData, setCuriositiesData] = useState(() => {
+        const saved = localStorage.getItem('ngv_curiosities');
+        return saved ? JSON.parse(saved) : INITIAL_CURIOSITIES;
+      });
+
+      useEffect(() => { localStorage.setItem('ngv_admin_users', JSON.stringify(adminUsers)); }, [adminUsers]);
+      useEffect(() => { localStorage.setItem('ngv_media', JSON.stringify(mediaSettings)); }, [mediaSettings]);
+      useEffect(() => { localStorage.setItem('ngv_hero', JSON.stringify(heroData)); }, [heroData]);
+      useEffect(() => { localStorage.setItem('ngv_updates', JSON.stringify(updatesData)); }, [updatesData]);
+      useEffect(() => { localStorage.setItem('ngv_betas', JSON.stringify(betasData)); }, [betasData]);
+      useEffect(() => { localStorage.setItem('ngv_characters', JSON.stringify(charactersData)); }, [charactersData]);
+      useEffect(() => { localStorage.setItem('ngv_bugs', JSON.stringify(bugsData)); }, [bugsData]);
+      useEffect(() => { localStorage.setItem('ngv_curiosities', JSON.stringify(curiositiesData)); }, [curiositiesData]);
+
+      const showToast = (message, type = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+      };
+
+      useEffect(() => {
+        if (heroData.length === 0) return;
+        const timer = setInterval(() => {
+          setHeroIdx((prev) => (prev + 1) % heroData.length);
+        }, 6000);
+        return () => clearInterval(timer);
+      }, [heroData.length]);
+
+      const handleAdminLogin = (e) => {
+        e.preventDefault();
+        const foundUser = adminUsers.find(
+          (u) => u.username.trim() === loginUsername.trim() && u.password === loginPassword
+        );
+
+        if (foundUser) {
+          setIsAdmin(true);
+          setCurrentUser(foundUser);
+          setShowLoginModal(false);
+          setLoginUsername('');
+          setLoginPassword('');
+          setAuthError('');
+          showToast(`¡Bienvenido/a ${foundUser.username}! Modo Administrador activado.`);
+        } else {
+          setAuthError('Usuario o contraseña incorrectos');
+        }
+      };
+
+      const handleSaveUser = (e) => {
+        e.preventDefault();
+        if (!userFormData.username.trim() || !userFormData.password.trim()) {
+          showToast('Nombre de usuario y contraseña requeridos', 'info');
+          return;
+        }
+
+        if (typeof userEditModal === 'object' && userEditModal !== null) {
+          setAdminUsers((prev) =>
+            prev.map((u) =>
+              u.id === userEditModal.id
+                ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: userFormData.role }
+                : u
+            )
+          );
+          if (currentUser?.id === userEditModal.id) {
+            setCurrentUser((prev) => ({ ...prev, username: userFormData.username.trim(), password: userFormData.password, role: userFormData.role }));
+          }
+          showToast(`Usuario ${userFormData.username} actualizado`);
+        } else {
+          const exists = adminUsers.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase());
+          if (exists) {
+            showToast('El nombre de usuario ya existe', 'info');
+            return;
+          }
+
+          let assignedRole = userFormData.role || 'Editor de Contenido';
+          if (currentUser?.role !== 'Super Administrador') {
+            assignedRole = 'Editor de Contenido';
+          }
+
+          const newUser = {
+            id: `usr-${Date.now()}`,
+            username: userFormData.username.trim(),
+            password: userFormData.password,
+            role: assignedRole,
+            createdAt: new Date().toISOString().split('T')[0]
+          };
+          setAdminUsers((prev) => [...prev, newUser]);
+          showToast(`Usuario ${newUser.username} creado correctamente`);
+        }
+
+        setUserEditModal(null);
+        setUserFormData({ username: '', password: '', role: 'Editor de Contenido' });
+      };
+
+      const handleDeleteUser = (userId) => {
+        if (adminUsers.length <= 1) {
+          showToast('No puedes eliminar el único usuario administrador', 'info');
+          return;
+        }
+
+        if (currentUser?.id === userId) {
+          showToast('No puedes eliminar tu propio usuario activo', 'info');
+          return;
+        }
+
+        const targetUser = adminUsers.find((u) => u.id === userId);
+        
+        if (currentUser?.role === 'Administrador') {
+          if (targetUser?.role === 'Super Administrador' || targetUser?.role === 'Administrador') {
+            showToast('No tienes permisos para eliminar un Administrador o Super Administrador', 'info');
+            return;
+          }
+        }
+
+        setAdminUsers((prev) => prev.filter((u) => u.id !== userId));
+        showToast(`Usuario ${targetUser?.username || ''} eliminado`, 'info');
+      };
+
+      const handleLike = (id) => {
+        setCuriositiesData((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, likes: item.likes + 1 } : item))
+        );
+      };
+
+      const openEditor = (category, item = null) => {
+        setEditorModal({ category, item });
+        if (item) {
+          if (category === 'characters') {
+            const statsArray = item.stats || [
+              { name: 'Ataque', value: item.attack || 80 },
+              { name: 'Agilidad', value: item.agility || 80 },
+              { name: 'Control', value: item.control || 80 }
+            ];
+            setFormData({ ...item, stats: statsArray });
+          } else {
+            setFormData({ ...item });
+          }
+        } else {
+          if (category === 'hero') {
+            setFormData({
+              title: '',
+              category: 'Nueva Noticia',
+              game: 'Título del Juego',
+              date: 'Justo Ahora',
+              image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
+              tag: 'Súper Update',
+              badgeColor: 'bg-purple-600 text-white',
+              description: ''
+            });
+          } else if (category === 'updates') {
+            setFormData({
+              game: 'Título del Juego',
+              version: 'v1.0.0',
+              date: 'Justo Ahora',
+              title: 'Título del Parche',
+              items: 'Primer cambio o arreglo...'
+            });
+          } else if (category === 'betas') {
+            setFormData({
+              title: '',
+              type: 'Beta Abierta',
+              status: 'Disponible Ahora',
+              platforms: 'PC, PS5',
+              developer: 'Studio Name',
+              dates: 'Próximamente',
+              description: ''
+            });
+          } else if (category === 'characters') {
+            setFormData({
+              name: '',
+              title: 'Título de Héroe',
+              game: 'Título del Juego',
+              role: 'Rol / Clase',
+              avatar: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+              lore: '',
+              stats: [
+                { name: 'Ataque', value: 80 },
+                { name: 'Agilidad', value: 75 }
+              ],
+              difficulty: 'Media'
+            });
+          } else if (category === 'bugs') {
+            setFormData({
+              game: 'Título del Juego',
+              bug: 'Descripción del Glitch/Error',
+              status: 'RESUELTO',
+              severity: 'Alta',
+              fix: 'Solución técnica implementada'
+            });
+          } else if (category === 'curiosities') {
+            setFormData({
+              icon: '🎮',
+              title: '',
+              game: 'Título del Juego',
+              detail: '',
+              likes: 0
+            });
+          }
+        }
+      };
+
+      const handleSaveForm = (e) => {
+        e.preventDefault();
+        const { category, item } = editorModal;
+
+        const isEdit = Boolean(item && item.id);
+        const newId = isEdit ? item.id : `${category}-${Date.now()}`;
+        const payload = { ...formData, id: newId };
+
+        if (category === 'hero') setHeroData((prev) => isEdit ? prev.map(i => i.id === newId ? payload : i) : [payload, ...prev]);
+        if (category === 'updates') setUpdatesData((prev) => isEdit ? prev.map(i => i.id === newId ? payload : i) : [payload, ...prev]);
+        if (category === 'betas') setBetasData((prev) => isEdit ? prev.map(i => i.id === newId ? payload : i) : [payload, ...prev]);
+        if (category === 'characters') setCharactersData((prev) => isEdit ? prev.map(i => i.id === newId ? payload : i) : [payload, ...prev]);
+        if (category === 'bugs') setBugsData((prev) => isEdit ? prev.map(i => i.id === newId ? payload : i) : [payload, ...prev]);
+        if (category === 'curiosities') setCuriositiesData((prev) => isEdit ? prev.map(i => i.id === newId ? payload : i) : [payload, ...prev]);
+
+        setEditorModal(null);
+        showToast(isEdit ? '¡Entrada actualizada!' : '¡Nueva entrada publicada!');
+      };
+
+      const handleDeleteItem = (category, id) => {
+        if (!isAdmin) return;
+        if (category === 'hero') setHeroData((prev) => prev.filter(i => i.id !== id));
+        if (category === 'updates') setUpdatesData((prev) => prev.filter(i => i.id !== id));
+        if (category === 'betas') setBetasData((prev) => prev.filter(i => i.id !== id));
+        if (category === 'characters') setCharactersData((prev) => prev.filter(i => i.id !== id));
+        if (category === 'bugs') setBugsData((prev) => prev.filter(i => i.id !== id));
+        if (category === 'curiosities') setCuriositiesData((prev) => prev.filter(i => i.id !== id));
+
+        showToast('Entrada eliminada correctamente', 'info');
+      };
+
+      const getEmbedVideoUrl = (url) => {
+        if (!url) return '';
+        if (url.includes('embed/')) return url;
+        let videoId = '';
+        if (url.includes('youtube.com/watch?v=')) {
+          videoId = url.split('v=')[1]?.split('&')[0];
+        } else if (url.includes('youtu.be/')) {
+          videoId = url.split('youtu.be/')[1]?.split('?')[0];
+        }
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+      };
+
+      const filterBySearch = (items, fields) => {
+        if (!searchQuery.trim()) return items;
+        const q = searchQuery.toLowerCase();
+        return items.filter((item) =>
+          fields.some((field) => String(item[field] || '').toLowerCase().includes(q))
+        );
+      };
+
+      const filteredHero = filterBySearch(heroData, ['title', 'game', 'description', 'category']);
+      const filteredUpdates = filterBySearch(updatesData, ['game', 'title', 'version', 'items']);
+      const filteredBetas = filterBySearch(betasData, ['title', 'developer', 'type', 'description']);
+      const filteredCharacters = filterBySearch(charactersData, ['name', 'title', 'game', 'role', 'lore']);
+      const filteredBugs = filterBySearch(bugsData, ['game', 'bug', 'fix', 'status']);
+      const filteredCuriosities = filterBySearch(curiositiesData, ['title', 'game', 'detail']);
+
+      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || heroData[0];
+
+      return (
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative selection:bg-purple-600 selection:text-white pb-16">
+          <BubbleCanvas />
+
+          {toast && (
+            <div className="fixed top-4 right-4 z-50 animate-bounce">
+              <div className={`px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-2 text-xs font-bold text-white ${
+                toast.type === 'info' ? 'bg-indigo-900 border-indigo-400' : 'bg-emerald-900 border-emerald-400'
+              }`}>
+                <Icon name="check-circle-2" className="w-4 h-4 text-emerald-400" />
+                <span>{toast.message}</span>
+              </div>
+            </div>
+          )}
+
+          {isAdmin && (
+            <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-900 border-b border-purple-400/40 py-1.5 px-4 sticky top-0 z-50 text-xs flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-2 text-purple-200">
+                <Icon name="shield-check" className="w-4 h-4 text-emerald-400 animate-pulse" />
+                <span className="font-bold text-white">Sesión Admin: <span className="text-purple-300 font-mono">{currentUser?.username || 'OsitoP3k'}</span></span>
+                <span className="hidden sm:inline text-purple-300">({currentUser?.role || 'Super Admin'})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowUserMgmtModal(true)}
+                  className="flex items-center gap-1 bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded border border-indigo-400/50 transition text-[11px] font-bold"
+                >
+                  <Icon name="users" className="w-3.5 h-3.5" />
+                  Gestión de Usuarios
+                </button>
+                <button
+                  onClick={() => setShowMediaSettingsModal(true)}
+                  className="flex items-center gap-1 bg-violet-700 hover:bg-violet-600 text-white px-2.5 py-1 rounded border border-violet-400/50 transition text-[11px] font-bold"
+                >
+                  <Icon name="video" className="w-3 h-3" />
+                  Configurar Video & Redes
+                </button>
+                <button
+                  onClick={() => {
+                    const fullBackup = { adminUsers, mediaSettings, heroData, updatesData, betasData, charactersData, bugsData, curiositiesData };
+                    const blob = new Blob([JSON.stringify(fullBackup, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `NewGameVerse_Backup_${Date.now()}.json`;
+                    a.click();
+                    showToast('Copia de seguridad descargada');
+                  }}
+                  className="flex items-center gap-1 bg-purple-800/80 hover:bg-purple-700 text-purple-100 px-2.5 py-1 rounded border border-purple-400/40 transition text-[11px]"
+                >
+                  <Icon name="download" className="w-3 h-3" />
+                  Exportar
+                </button>
+                <button
+                  onClick={() => {
+                    setIsAdmin(false);
+                    setCurrentUser(null);
+                    showToast('Sesión de administrador cerrada', 'info');
+                  }}
+                  className="flex items-center gap-1 bg-red-900/80 hover:bg-red-800 text-red-100 px-2.5 py-1 rounded border border-red-400/40 transition text-[11px]"
+                >
+                  <Icon name="log-out" className="w-3 h-3" />
+                  Salir
+                </button>
+              </div>
+            </div>
+          )}
+
+          <header className={`sticky ${isAdmin ? 'top-[33px]' : 'top-0'} z-40 bg-purple-950/90 backdrop-blur-md border-b border-purple-800/60 shadow-lg`}>
+            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+              
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="relative group cursor-pointer" onClick={() => setActiveTab('all')}>
+                  <div className="p-2 bg-gradient-to-tr from-purple-700 to-violet-500 rounded-xl shadow-lg border border-purple-300/40 text-white transform group-hover:scale-105 transition duration-300">
+                    <Icon name="gamepad-2" className="w-6 h-6 animate-pulse" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-lg font-black tracking-wider text-white flex items-center gap-1">
+                    NewGame<span className="text-purple-400">Verse</span>
+                  </h1>
+                  <p className="text-[10px] text-purple-300 font-mono tracking-widest uppercase">Portal Gamer Dinámico</p>
+                </div>
+              </div>
+
+              <nav className="hidden lg:flex items-center gap-1 bg-purple-900/50 p-1 rounded-xl border border-purple-700/50">
+                {[
+                  { id: 'all', label: 'Inicio', icon: 'flame' },
+                  { id: 'updates', label: 'Updates', icon: 'refresh-cw' },
+                  { id: 'betas', label: 'Betas & Alphas', icon: 'radio' },
+                  { id: 'characters', label: 'Personajes', icon: 'user-check' },
+                  { id: 'bugs', label: 'Bugs & Patches', icon: 'bug' },
+                  { id: 'curiosities', label: 'Curiosidades', icon: 'star' }
+                ].map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 ${
+                        isActive
+                          ? 'bg-purple-600 text-white shadow-md border border-purple-300/40'
+                          : 'text-purple-200 hover:text-white hover:bg-purple-800/40'
+                      }`}
+                    >
+                      <Icon name={tab.icon} className={`w-3.5 h-3.5 ${isActive ? 'text-purple-200' : 'text-purple-400'}`} />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="relative max-w-[180px] sm:max-w-xs md:max-w-sm lg:max-w-md w-full">
+                  <Icon name="search" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-purple-300 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Buscar juegos..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-purple-900/40 border border-purple-700/60 rounded-full pl-9 pr-8 py-1.5 text-xs text-white placeholder-purple-300/70 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-purple-300 hover:text-white p-0.5"
+                    >
+                      <Icon name="x" className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {isAdmin ? (
+                  <button
+                    onClick={() => setShowUserMgmtModal(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-full border border-indigo-400/60 shadow-lg text-xs font-bold transition shrink-0"
+                  >
+                    <Icon name="users" className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Usuarios</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="p-2 bg-purple-900/60 hover:bg-purple-800 text-purple-200 hover:text-white rounded-xl border border-purple-700/60 transition shrink-0"
+                  >
+                    <Icon name="key" className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-7xl mx-auto px-4 py-8 space-y-10 relative z-10">
+
+            {activeTab === 'all' && (
+              <div className="space-y-10">
+                {currentHero && (
+                  <section className="relative rounded-2xl overflow-hidden shadow-2xl border border-purple-500/30 bg-purple-950/60 group">
+                    <div className="relative h-80 sm:h-96 w-full overflow-hidden">
+                      <img
+                        src={currentHero.image}
+                        alt={currentHero.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+                      
+                      {isAdmin && (
+                        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+                          <button
+                            onClick={() => openEditor('hero', currentHero)}
+                            className="p-2 bg-purple-900/90 hover:bg-purple-800 text-white rounded-lg border border-purple-400 shadow-lg"
+                          >
+                            <Icon name="edit-3" className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem('hero', currentHero.id)}
+                            className="p-2 bg-red-900/90 hover:bg-red-800 text-white rounded-lg border border-red-400 shadow-lg"
+                          >
+                            <Icon name="trash-2" className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => openEditor('hero')}
+                            className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-lg border border-emerald-400 shadow-lg"
+                          >
+                            <Icon name="plus" className="w-4 h-4" />
+                            Nueva Noticia
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="absolute bottom-6 left-6 right-6 space-y-3 z-10">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[11px] font-bold px-3 py-1 rounded-full ${currentHero.badgeColor || 'bg-purple-600 text-white'}`}>
+                            {currentHero.tag || currentHero.category}
+                          </span>
+                          <span className="text-xs text-purple-300/90 font-semibold">{currentHero.game} • {currentHero.date}</span>
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-black text-white max-w-2xl leading-tight drop-shadow-md">
+                          {currentHero.title}
+                        </h2>
+                        <p className="text-xs sm:text-sm text-purple-100/90 max-w-xl line-clamp-2">
+                          {currentHero.description}
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                <section className="bg-purple-950/40 border border-purple-500/30 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md space-y-6 relative overflow-hidden">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-800/60 pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-gradient-to-tr from-purple-600 to-violet-500 text-white rounded-xl shadow-lg border border-purple-300/40">
+                        <Icon name="video" className="w-6 h-6 animate-pulse" />
+                      </div>
+                      <div>
+                        <span className="text-[11px] font-mono font-bold text-purple-400 uppercase tracking-widest">Video Destacado</span>
+                        <h2 className="text-xl sm:text-2xl font-black text-white">{mediaSettings.videoTitle}</h2>
+                      </div>
+                    </div>
+
+                    {isAdmin && (
+                      <button
+                        onClick={() => setShowMediaSettingsModal(true)}
+                        className="self-start sm:self-center flex items-center gap-1.5 bg-purple-800 hover:bg-purple-700 text-white text-xs font-bold px-3 py-2 rounded-xl border border-purple-400/50 shadow transition"
+                      >
+                        <Icon name="edit-3" className="w-3.5 h-3.5" />
+                        Cambiar Video & Links
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="relative w-full rounded-xl overflow-hidden shadow-2xl border border-purple-600/40 aspect-video bg-slate-950">
+                    <iframe
+                      src={getEmbedVideoUrl(mediaSettings.videoUrl)}
+                      title={mediaSettings.videoTitle}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </section>
+
+                <section className="bg-gradient-to-r from-purple-950/80 via-slate-900/90 to-purple-950/80 border border-purple-500/40 rounded-2xl p-6 sm:p-8 shadow-xl text-center space-y-6">
+                  <div className="max-w-md mx-auto space-y-2">
+                    <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
+                      <Icon name="share-2" className="w-5 h-5 text-purple-400" />
+                      Únete a Nuestra Comunidad
+                    </h3>
+                    <p className="text-xs text-purple-200/80">
+                      Sigue las redes oficiales de NewGameVerse para participar en sorteos, alphas exclusivas y chat en vivo.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-2">
+                    <a href={mediaSettings.discordUrl} target="_blank" className="flex items-center gap-3 bg-[#5865F2]/20 hover:bg-[#5865F2] text-white px-5 py-3 rounded-xl border border-[#5865F2]/50 shadow-lg hover:scale-105 transition duration-300">
+                      <DiscordIcon className="w-7 h-7 text-[#5865F2]" />
+                      <span className="font-bold text-sm">Discord</span>
+                    </a>
+                    <a href={mediaSettings.instagramUrl} target="_blank" className="flex items-center gap-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-600 hover:to-purple-600 text-white px-5 py-3 rounded-xl border border-pink-500/50 shadow-lg hover:scale-105 transition duration-300">
+                      <InstagramIcon className="w-7 h-7 text-pink-400" />
+                      <span className="font-bold text-sm">Instagram</span>
+                    </a>
+                    <a href={mediaSettings.tiktokUrl} target="_blank" className="flex items-center gap-3 bg-slate-800/80 hover:bg-black text-white px-5 py-3 rounded-xl border border-purple-400/40 shadow-lg hover:scale-105 transition duration-300">
+                      <TikTokIcon className="w-7 h-7 text-teal-300" />
+                      <span className="font-bold text-sm">TikTok</span>
+                    </a>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {/* SECCIÓN PERSONAJES */}
+            {activeTab === 'characters' && (
+              <section className="space-y-5">
+                <div className="flex items-center justify-between border-b border-purple-800/50 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-600/90 text-white rounded-xl shadow-md border border-purple-400/30">
+                      <Icon name="user-check" className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-black text-white">Personajes & Lore Destacado</h2>
+                      <p className="text-xs text-purple-300/80">Estadísticas, habilidades e historia oficial</p>
+                    </div>
+                  </div>
+                  {isAdmin && (
+                    <button onClick={() => openEditor('characters')} className="flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-400">
+                      <Icon name="plus" className="w-4 h-4" /> Agregar Personaje
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {filteredCharacters.map((char) => (
+                    <div key={char.id} className="bg-white/95 text-slate-900 rounded-xl overflow-hidden shadow-lg border border-purple-300">
+                      <div className="relative h-48">
+                        <img src={char.avatar} className="w-full h-full object-cover" />
+                        {isAdmin && (
+                          <div className="absolute top-3 right-3 flex gap-1">
+                            <button onClick={() => openEditor('characters', char)} className="p-1.5 bg-purple-900 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => handleDeleteItem('characters', char.id)} className="p-1.5 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <h3 className="text-lg font-black">{char.name}</h3>
+                        <p className="text-xs text-slate-600">{char.lore}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* SECCIÓN BUGS Y DEMÁS SECCIONES DE TU CÓDIGO */}
+            {activeTab === 'bugs' && (
+              <section className="space-y-5">
+                <div className="flex items-center justify-between border-b border-purple-800/50 pb-3">
+                  <h2 className="text-lg font-black text-white">Bugs & Soluciones (Glitch Log)</h2>
+                  {isAdmin && (
+                    <button onClick={() => openEditor('bugs')} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+                      + Agregar Bug
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {filteredBugs.map((b) => (
+                    <div key={b.id} className="bg-purple-950/50 border border-purple-500/40 p-4 rounded-xl">
+                      <h3 className="text-xs font-bold text-white">{b.bug}</h3>
+                      <p className="text-xs text-purple-300 font-mono mt-2">Fix: {b.fix}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+          </main>
+
+          {/* MODAL DE LOGIN ADMIN COMPLETO */}
+          {showLoginModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+              <div className="bg-purple-950 border border-purple-400/60 rounded-2xl max-w-sm w-full p-6 relative shadow-2xl space-y-5">
+                <button onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 text-purple-300"><Icon name="x" className="w-4 h-4" /></button>
+                <h3 className="text-lg font-black text-white text-center">Acceso Administrador</h3>
+                <form onSubmit={handleAdminLogin} className="space-y-4">
+                  <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white" />
+                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white font-mono" />
+                  {authError && <p className="text-xs text-red-400">{authError}</p>}
+                  <button type="submit" className="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl">Iniciar Sesión</button>
+                </form>
+              </div>
+            </div>
+          )}
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
