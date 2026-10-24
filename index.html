@@ -242,23 +242,27 @@
         try {
           const { data, error } = await supabaseClient.from('app_data').select('*');
           if (error) {
-            console.error("Error Supabase:", error);
+            console.error("Error al leer Supabase:", error);
             return;
           }
           if (data && data.length > 0) {
             data.forEach(row => {
-              if (row.key === 'ngv_u' && row.payload) setAdminUsers(row.payload);
-              if (row.key === 'ngv_m' && row.payload) setMediaSettings(row.payload);
-              if (row.key === 'ngv_h' && row.payload) setHeroData(row.payload);
-              if (row.key === 'ngv_up' && row.payload) setUpdatesData(row.payload);
-              if (row.key === 'ngv_b' && row.payload) setBetasData(row.payload);
-              if (row.key === 'ngv_c' && row.payload) setCharactersData(row.payload);
-              if (row.key === 'ngv_bg' && row.payload) setBugsData(row.payload);
-              if (row.key === 'ngv_cu' && row.payload) setCuriositiesData(row.payload);
+              let parsedPayload = row.payload;
+              if (typeof parsedPayload === 'string') {
+                try { parsedPayload = JSON.parse(parsedPayload); } catch(e) {}
+              }
+              if (row.key === 'ngv_u' && parsedPayload) setAdminUsers(parsedPayload);
+              if (row.key === 'ngv_m' && parsedPayload) setMediaSettings(parsedPayload);
+              if (row.key === 'ngv_h' && parsedPayload) setHeroData(parsedPayload);
+              if (row.key === 'ngv_up' && parsedPayload) setUpdatesData(parsedPayload);
+              if (row.key === 'ngv_b' && parsedPayload) setBetasData(parsedPayload);
+              if (row.key === 'ngv_c' && parsedPayload) setCharactersData(parsedPayload);
+              if (row.key === 'ngv_bg' && parsedPayload) setBugsData(parsedPayload);
+              if (row.key === 'ngv_cu' && parsedPayload) setCuriositiesData(parsedPayload);
             });
-            showToast('¡Sincronizado con la nube!');
+            showToast('¡Datos sincronizados!');
           } else {
-            // Sembramos los datos iniciales de forma silenciosa
+            // Sembramos los datos iniciales si está vacío
             await persistData('ngv_u', INITIAL_ADMIN_USERS, false);
             await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, false);
             await persistData('ngv_h', INITIAL_HERO, false);
