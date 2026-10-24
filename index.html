@@ -256,8 +256,8 @@
               if (row.key === 'ngv_bg' && row.payload) setBugsData(row.payload);
               if (row.key === 'ngv_cu' && row.payload) setCuriositiesData(row.payload);
             });
-            showToast('¡Sincronizado con Supabase!');
           } else {
+            // Inicializar datos por defecto si la tabla está vacía
             await persistData('ngv_u', INITIAL_ADMIN_USERS, setAdminUsers);
             await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, setMediaSettings);
             await persistData('ngv_h', INITIAL_HERO, setHeroData);
@@ -268,27 +268,45 @@
             await persistData('ngv_cu', INITIAL_CURIOSITIES, setCuriositiesData);
           }
         } catch (e) {
-          console.error("Excepción:", e);
+          console.error("Excepción al cargar:", e);
         } finally {
           setIsSyncing(false);
         }
       };
 
+      // Carga inicial y Suscripción Realtime en vivo para sincronización multi-dispositivo automática
       useEffect(() => {
         fetchCloudData();
+
+        const subscription = supabaseClient
+          .channel('public:app_data')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'app_data' }, (payload) => {
+            console.log('Cambio detectado en tiempo real desde otro dispositivo:', payload);
+            fetchCloudData();
+          })
+          .subscribe();
+
+        return () => {
+          supabaseClient.removeChannel(subscription);
+        };
       }, []);
 
       const persistData = async (key, data, setter) => {
-        setter(data);
+        setter(data); // Actualización local instantánea
         try {
           const { error } = await supabaseClient
             .from('app_data')
-            .upsert({ key, payload: data, updated_at: new Date() }, { onConflict: 'key' });
+            .upsert({ 
+              key, 
+              payload: data, 
+              updated_at: new Date().toISOString() 
+            }, { onConflict: 'key' });
+
           if (error) {
             console.error("Error al guardar en Supabase:", error);
+            showToast('Error al guardar en la nube', 'info');
           } else {
-            // Forzar recarga automática de datos de la nube tras guardar
-            fetchCloudData();
+            showToast('¡Guardado y sincronizado en la nube!');
           }
         } catch (err) {
           console.warn("Cloud save exception:", err);
@@ -399,7 +417,6 @@
         if (category === 'curiosities') persistData('ngv_cu', isEdit ? curiositiesData.map(i => i.id === newId ? payload : i) : [payload, ...curiositiesData], setCuriositiesData);
 
         setEditorModal(null);
-        showToast('Guardado y sincronizado');
       };
 
       const handleDeleteItem = (category, id) => {
@@ -711,7 +728,6 @@
                   e.preventDefault();
                   persistData('ngv_m', mediaSettings, setMediaSettings);
                   setShowMediaSettingsModal(false);
-                  showToast('¡Guardado correctamente!');
                 }} className="space-y-3 text-xs">
                   <div><label className="block text-purple-200 font-bold mb-1">Título del Video</label><input type="text" value={mediaSettings.videoTitle} onChange={(e) => setMediaSettings({...mediaSettings, videoTitle: e.target.value})} className="w-full bg-slate-900 border border-purple-700 rounded p-2 text-white" /></div>
                   <div><label className="block text-purple-200 font-bold mb-1">URL YouTube Video</label><input type="text" value={mediaSettings.videoUrl} onChange={(e) => setMediaSettings({...mediaSettings, videoUrl: e.target.value})} className="w-full bg-slate-900 border border-purple-700 rounded p-2 text-white font-mono" /></div>
