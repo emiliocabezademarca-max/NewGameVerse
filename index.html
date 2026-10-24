@@ -258,11 +258,19 @@
             });
             showToast('¡Sincronizado con Supabase!');
           } else {
-            showToast('La tabla en Supabase está vacía', 'info');
+            // Si la tabla está vacía, subimos los datos iniciales por defecto a Supabase
+            await persistData('ngv_u', INITIAL_ADMIN_USERS, setAdminUsers);
+            await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, setMediaSettings);
+            await persistData('ngv_h', INITIAL_HERO, setHeroData);
+            await persistData('ngv_up', INITIAL_UPDATES, setUpdatesData);
+            await persistData('ngv_b', INITIAL_BETAS, setBetasData);
+            await persistData('ngv_c', INITIAL_CHARACTERS, setCharactersData);
+            await persistData('ngv_bg', INITIAL_BUGS, setBugsData);
+            await persistData('ngv_cu', INITIAL_CURIOSITIES, setCuriositiesData);
+            showToast('¡Base de datos inicializada en la nube!');
           }
         } catch (e) {
           console.error("Excepción:", e);
-          showToast('Error de conexión', 'info');
         } finally {
           setIsSyncing(false);
         }
@@ -275,10 +283,11 @@
       const persistData = async (key, data, setter) => {
         setter(data);
         try {
-          const { error } = await supabaseClient.from('app_data').upsert({ key, payload: data, updated_at: new Date() });
+          const { error } = await supabaseClient
+            .from('app_data')
+            .upsert({ key, payload: data, updated_at: new Date() }, { onConflict: 'key' });
           if (error) {
             console.error("Error al guardar en Supabase:", error);
-            showToast('Error al guardar en Supabase (Verifica RLS)', 'info');
           }
         } catch (err) {
           console.warn("Cloud save exception:", err);
@@ -832,7 +841,7 @@
                 <h3 className="text-lg font-black text-white text-center">Acceso Administrador</h3>
                 <form onSubmit={handleAdminLogin} className="space-y-3">
                   <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white" />
-                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white font-mono" />
+                    <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white font-mono" />
                   {authError && <p className="text-xs text-red-400">{authError}</p>}
                   <button type="submit" className="w-full py-2 bg-purple-600 text-white font-bold text-xs rounded-xl">Entrar</button>
                 </form>
@@ -843,8 +852,7 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    ReactDOM.createRoot(default = document.getElementById('root')).render(<App />);
   </script>
 </body>
 </html>
-
