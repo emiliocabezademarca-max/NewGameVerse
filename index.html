@@ -242,7 +242,8 @@
         try {
           const { data, error } = await supabaseClient.from('app_data').select('*');
           if (error) {
-            console.error("Error Supabase:", error);
+            console.error("Error al leer Supabase:", error);
+            showToast('Error de conexión con la nube', 'info');
             return;
           }
           if (data && data.length > 0) {
@@ -256,57 +257,45 @@
               if (row.key === 'ngv_bg' && row.payload) setBugsData(row.payload);
               if (row.key === 'ngv_cu' && row.payload) setCuriositiesData(row.payload);
             });
+            showToast('¡Sincronizado correctamente!');
           } else {
-            // Inicializar datos por defecto si la tabla está vacía
-            await persistData('ngv_u', INITIAL_ADMIN_USERS, setAdminUsers);
-            await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, setMediaSettings);
-            await persistData('ngv_h', INITIAL_HERO, setHeroData);
-            await persistData('ngv_up', INITIAL_UPDATES, setUpdatesData);
-            await persistData('ngv_b', INITIAL_BETAS, setBetasData);
-            await persistData('ngv_c', INITIAL_CHARACTERS, setCharactersData);
-            await persistData('ngv_bg', INITIAL_BUGS, setBugsData);
-            await persistData('ngv_cu', INITIAL_CURIOSITIES, setCuriositiesData);
+            // Si la tabla está vacía, sembramos los datos iniciales
+            await persistData('ngv_u', INITIAL_ADMIN_USERS, false);
+            await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, false);
+            await persistData('ngv_h', INITIAL_HERO, false);
+            await persistData('ngv_up', INITIAL_UPDATES, false);
+            await persistData('ngv_b', INITIAL_BETAS, false);
+            await persistData('ngv_c', INITIAL_CHARACTERS, false);
+            await persistData('ngv_bg', INITIAL_BUGS, false);
+            await persistData('ngv_cu', INITIAL_CURIOSITIES, false);
+            showToast('¡Base de datos inicializada!');
           }
         } catch (e) {
-          console.error("Excepción al cargar:", e);
+          console.error("Excepción:", e);
         } finally {
           setIsSyncing(false);
         }
       };
 
-      // Carga inicial y Suscripción Realtime en vivo para sincronización multi-dispositivo automática
       useEffect(() => {
         fetchCloudData();
-
-        const subscription = supabaseClient
-          .channel('public:app_data')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'app_data' }, (payload) => {
-            console.log('Cambio detectado en tiempo real desde otro dispositivo:', payload);
-            fetchCloudData();
-          })
-          .subscribe();
-
-        return () => {
-          supabaseClient.removeChannel(subscription);
-        };
       }, []);
 
-      const persistData = async (key, data, setter) => {
-        setter(data); // Actualización local instantánea
+      const persistData = async (key, payloadData, showNotification = true) => {
         try {
           const { error } = await supabaseClient
             .from('app_data')
             .upsert({ 
-              key, 
-              payload: data, 
+              key: key, 
+              payload: payloadData, 
               updated_at: new Date().toISOString() 
             }, { onConflict: 'key' });
 
           if (error) {
             console.error("Error al guardar en Supabase:", error);
-            showToast('Error al guardar en la nube', 'info');
+            if (showNotification) showToast('Error al guardar en la nube', 'info');
           } else {
-            showToast('¡Guardado y sincronizado en la nube!');
+            if (showNotification) showToast('¡Guardado y sincronizado en la nube!');
           }
         } catch (err) {
           console.warn("Cloud save exception:", err);
@@ -374,7 +363,8 @@
           updatedUsers = [...adminUsers, newUser];
         }
 
-        persistData('ngv_u', updatedUsers, setAdminUsers);
+        setAdminUsers(updatedUsers);
+        persistData('ngv_u', updatedUsers);
         setUserEditModal(null);
         setUserFormData({ username: '', password: '', role: 'Editor de Contenido' });
       };
@@ -385,7 +375,8 @@
           return;
         }
         const updatedUsers = adminUsers.filter((u) => u.id !== userId);
-        persistData('ngv_u', updatedUsers, setAdminUsers);
+        setAdminUsers(updatedUsers);
+        persistData('ngv_u', updatedUsers);
       };
 
       const openEditor = (category, item = null) => {
@@ -409,24 +400,62 @@
         const newId = isEdit ? item.id : `${category}-${Date.now()}`;
         const payload = { ...formData, id: newId };
 
-        if (category === 'hero') persistData('ngv_h', isEdit ? heroData.map(i => i.id === newId ? payload : i) : [payload, ...heroData], setHeroData);
-        if (category === 'updates') persistData('ngv_up', isEdit ? updatesData.map(i => i.id === newId ? payload : i) : [payload, ...updatesData], setUpdatesData);
-        if (category === 'betas') persistData('ngv_b', isEdit ? betasData.map(i => i.id === newId ? payload : i) : [payload, ...betasData], setBetasData);
-        if (category === 'characters') persistData('ngv_c', isEdit ? charactersData.map(i => i.id === newId ? payload : i) : [payload, ...charactersData], setCharactersData);
-        if (category === 'bugs') persistData('ngv_bg', isEdit ? bugsData.map(i => i.id === newId ? payload : i) : [payload, ...bugsData], setBugsData);
-        if (category === 'curiosities') persistData('ngv_cu', isEdit ? curiositiesData.map(i => i.id === newId ? payload : i) : [payload, ...curiositiesData], setCuriositiesData);
+        if (category === 'hero') {
+          const updated = isEdit ? heroData.map(i => i.id === newId ? payload : i) : [payload, ...heroData];
+          setHeroData(updated);
+          persistData('ngv_h', updated);
+        } else if (category === 'updates') {
+          const updated = isEdit ? updatesData.map(i => i.id === newId ? payload : i) : [payload, ...updatesData];
+          setUpdatesData(updated);
+          persistData('ngv_up', updated);
+        } else if (category === 'betas') {
+          const updated = isEdit ? betasData.map(i => i.id === newId ? payload : i) : [payload, ...betasData];
+          setBetasData(updated);
+          persistData('ngv_b', updated);
+        } else if (category === 'characters') {
+          const updated = isEdit ? charactersData.map(i => i.id === newId ? payload : i) : [payload, ...charactersData];
+          setCharactersData(updated);
+          persistData('ngv_c', updated);
+        } else if (category === 'bugs') {
+          const updated = isEdit ? bugsData.map(i => i.id === newId ? payload : i) : [payload, ...bugsData];
+          setBugsData(updated);
+          persistData('ngv_bg', updated);
+        } else if (category === 'curiosities') {
+          const updated = isEdit ? curiositiesData.map(i => i.id === newId ? payload : i) : [payload, ...curiositiesData];
+          setCuriositiesData(updated);
+          persistData('ngv_cu', updated);
+        }
 
         setEditorModal(null);
       };
 
       const handleDeleteItem = (category, id) => {
         if (!isAdmin) return;
-        if (category === 'hero') persistData('ngv_h', heroData.filter(i => i.id !== id), setHeroData);
-        if (category === 'updates') persistData('ngv_up', updatesData.filter(i => i.id !== id), setUpdatesData);
-        if (category === 'betas') persistData('ngv_b', betasData.filter(i => i.id !== id), setBetasData);
-        if (category === 'characters') persistData('ngv_c', charactersData.filter(i => i.id !== id), setCharactersData);
-        if (category === 'bugs') persistData('ngv_bg', bugsData.filter(i => i.id !== id), setBugsData);
-        if (category === 'curiosities') persistData('ngv_cu', curiositiesData.filter(i => i.id !== id), setCuriositiesData);
+        if (category === 'hero') {
+          const updated = heroData.filter(i => i.id !== id);
+          setHeroData(updated);
+          persistData('ngv_h', updated);
+        } else if (category === 'updates') {
+          const updated = updatesData.filter(i => i.id !== id);
+          setUpdatesData(updated);
+          persistData('ngv_up', updated);
+        } else if (category === 'betas') {
+          const updated = betasData.filter(i => i.id !== id);
+          setBetasData(updated);
+          persistData('ngv_b', updated);
+        } else if (category === 'characters') {
+          const updated = charactersData.filter(i => i.id !== id);
+          setCharactersData(updated);
+          persistData('ngv_c', updated);
+        } else if (category === 'bugs') {
+          const updated = bugsData.filter(i => i.id !== id);
+          setBugsData(updated);
+          persistData('ngv_bg', updated);
+        } else if (category === 'curiosities') {
+          const updated = curiositiesData.filter(i => i.id !== id);
+          setCuriositiesData(updated);
+          persistData('ngv_cu', updated);
+        }
         showToast('Eliminado', 'info');
       };
 
@@ -726,7 +755,7 @@
                 <h3 className="text-base font-black text-white">Configurar Video & Redes</h3>
                 <form onSubmit={(e) => {
                   e.preventDefault();
-                  persistData('ngv_m', mediaSettings, setMediaSettings);
+                  persistData('ngv_m', mediaSettings);
                   setShowMediaSettingsModal(false);
                 }} className="space-y-3 text-xs">
                   <div><label className="block text-purple-200 font-bold mb-1">Título del Video</label><input type="text" value={mediaSettings.videoTitle} onChange={(e) => setMediaSettings({...mediaSettings, videoTitle: e.target.value})} className="w-full bg-slate-900 border border-purple-700 rounded p-2 text-white" /></div>
