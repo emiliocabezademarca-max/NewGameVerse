@@ -258,7 +258,6 @@
             });
             showToast('¡Sincronizado con Supabase!');
           } else {
-            // Si la tabla está vacía, subimos los datos iniciales por defecto a Supabase
             await persistData('ngv_u', INITIAL_ADMIN_USERS, setAdminUsers);
             await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, setMediaSettings);
             await persistData('ngv_h', INITIAL_HERO, setHeroData);
@@ -267,7 +266,6 @@
             await persistData('ngv_c', INITIAL_CHARACTERS, setCharactersData);
             await persistData('ngv_bg', INITIAL_BUGS, setBugsData);
             await persistData('ngv_cu', INITIAL_CURIOSITIES, setCuriositiesData);
-            showToast('¡Base de datos inicializada en la nube!');
           }
         } catch (e) {
           console.error("Excepción:", e);
@@ -288,6 +286,9 @@
             .upsert({ key, payload: data, updated_at: new Date() }, { onConflict: 'key' });
           if (error) {
             console.error("Error al guardar en Supabase:", error);
+          } else {
+            // Forzar recarga automática de datos de la nube tras guardar
+            fetchCloudData();
           }
         } catch (err) {
           console.warn("Cloud save exception:", err);
@@ -296,7 +297,7 @@
 
       const showToast = (message, type = 'success') => {
         setToast({ message, type });
-        setTimeout(() => setToast(null), 3500);
+        setTimeout(() => setToast(null), 3000);
       };
 
       useEffect(() => {
@@ -398,7 +399,7 @@
         if (category === 'curiosities') persistData('ngv_cu', isEdit ? curiositiesData.map(i => i.id === newId ? payload : i) : [payload, ...curiositiesData], setCuriositiesData);
 
         setEditorModal(null);
-        showToast('Guardado y enviado a Supabase');
+        showToast('Guardado y sincronizado');
       };
 
       const handleDeleteItem = (category, id) => {
@@ -841,7 +842,7 @@
                 <h3 className="text-lg font-black text-white text-center">Acceso Administrador</h3>
                 <form onSubmit={handleAdminLogin} className="space-y-3">
                   <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white" />
-                    <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white font-mono" />
+                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-slate-900 border border-purple-700 rounded-xl px-3 py-2 text-xs text-white font-mono" />
                   {authError && <p className="text-xs text-red-400">{authError}</p>}
                   <button type="submit" className="w-full py-2 bg-purple-600 text-white font-bold text-xs rounded-xl">Entrar</button>
                 </form>
