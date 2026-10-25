@@ -29,19 +29,49 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcnRlbGtodWZnb3Juc2Nqcm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3OTc0MzksImV4cCI6MjEwODM3MzQzOX0.GiSFTIPiQTUyEIcNlzAoJ7nxm-o2bzPPmHzb7HIkVaA';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // COMPONENTE DE ICONOS SEGURO PARA REACT
+    // --- COMPONENTE ICON BLINDADO (EVITA LA PANTALLA NEGRA) ---
     const Icon = ({ name, className = "w-4 h-4" }) => {
-      const iconRef = useRef(null);
+      const spanRef = useRef(null);
       useEffect(() => {
-        if (window.lucide && iconRef.current) {
-          window.lucide.createIcons({
-            attrs: { class: className },
-            nameAttr: 'data-lucide',
-            root: iconRef.current.parentElement
-          });
+        if (window.lucide && spanRef.current) {
+          spanRef.current.innerHTML = `<i data-lucide="${name}" class="${className}"></i>`;
+          window.lucide.createIcons({ root: spanRef.current });
         }
       }, [name, className]);
-      return <i ref={iconRef} data-lucide={name} className={className}></i>;
+      // 'contents' hace que el span sea invisible al layout, previniendo crashes de React
+      return <span ref={spanRef} className="contents"></span>;
+    };
+
+    // --- COMPONENTE DE EDICIÓN DE TEXTO INLINE ---
+    const EditableText = ({ tKey, defaultText, className, as: Component = 'span', isVisualEditorMode, themeConfig, onTextChange }) => {
+      const [isEditing, setIsEditing] = useState(false);
+      const val = themeConfig.texts?.[tKey] || defaultText;
+      const inputRef = useRef(null);
+
+      useEffect(() => {
+        if (isEditing && inputRef.current) inputRef.current.focus();
+      }, [isEditing]);
+
+      if (isEditing && isVisualEditorMode) {
+        return (
+          <input
+            ref={inputRef}
+            defaultValue={val}
+            onBlur={(e) => { onTextChange(tKey, e.target.value); setIsEditing(false); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+            className={`bg-pink-900/80 text-white outline-none ring-2 ring-pink-400 rounded px-1 min-w-[50px] max-w-full ${className || ''}`}
+            style={{ fontSize: 'inherit', fontWeight: 'inherit', display: 'inline-block' }}
+          />
+        );
+      }
+
+      const editProps = isVisualEditorMode ? {
+        onClick: (e) => { e.preventDefault(); e.stopPropagation(); setIsEditing(true); },
+        className: `${className || ''} ring-2 ring-transparent hover:ring-pink-500 cursor-text transition-all rounded px-1`,
+        title: "Haz clic para editar texto"
+      } : { className };
+
+      return <Component {...editProps}>{val}</Component>;
     };
 
     const DiscordIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>;
@@ -71,7 +101,6 @@
           return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '168, 85, 247';
         };
         const themeColorRGB = hexToRgb(config.primaryColor);
-
         const numBubbles = Math.min(Math.floor(width / 20), 40);
         const bubbles = Array.from({ length: numBubbles }, () => ({
           x: Math.random() * width, y: Math.random() * height,
@@ -127,27 +156,13 @@
       return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-80" />;
     };
 
-    // --- INITIAL DATA & THEME ---
+    // --- DATOS INICIALES ---
     const INITIAL_THEME = {
-      primaryColor: '#9333ea',
-      bgColor: '#020617',
-      bgType: 'color', 
-      bgImage: '',
-      headerBg: 'rgba(59, 7, 100, 0.9)',
-      borderRadius: '1rem',
-      cardStyle: 'glass', 
-      showParticles: true,
-      siteName: 'NewGameVerse',
-      siteLogo: '',
-      fontFamily: 'sans-serif',
+      primaryColor: '#9333ea', bgColor: '#020617', bgType: 'color', bgImage: '', headerBg: 'rgba(59, 7, 100, 0.9)',
+      borderRadius: '1rem', cardStyle: 'glass', showParticles: true, siteName: 'NewGameVerse', siteLogo: '', fontFamily: 'sans-serif',
       layoutOrder: ['hero', 'video', 'social'],
-      texts: {
-        tabAll: 'Inicio', tabUpdates: 'Updates', tabBetas: 'Betas & Alphas', tabChars: 'Personajes', tabBugs: 'Bugs', tabCurio: 'Curiosidades',
-        communityTitle: 'Comunidad Oficial', communitySub: 'Sigue nuestras redes sociales.',
-        searchPlaceholder: 'Buscar juegos...', loginText: 'Acceso Administrador'
-      }
+      texts: { tabAll: 'Inicio', tabUpdates: 'Updates', tabBetas: 'Betas & Alphas', tabChars: 'Personajes', tabBugs: 'Bugs & Patches', tabCurio: 'Curiosidades', communityTitle: 'Comunidad Oficial', communitySub: 'Sigue nuestras redes sociales.', searchPlaceholder: 'Buscar juegos...' }
     };
-
     const INITIAL_MEDIA_SETTINGS = { videoTitle: 'Trailer Oficial de Temporada', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0', discordUrl: 'https://discord.gg', instagramUrl: 'https://instagram.com', tiktokUrl: 'https://tiktok.com' };
     const INITIAL_HERO = [{ id: 'h-1', title: 'Aetheria Legends', category: 'Súper Update', game: 'Aetheria', date: 'Hace 1h', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', tag: 'Parche 4.0', description: 'Explora el nuevo continente flotante.' }];
     const INITIAL_BETAS = [{ id: 'b-1', title: 'Valiant Realms', type: 'Beta Abierta', description: 'MMORPG de fantasía.' }];
@@ -210,29 +225,30 @@
               if (row.key === 'ngv_bg' && parsedPayload) setBugsData(parsedPayload);
               if (row.key === 'ngv_cu' && parsedPayload) setCuriositiesData(parsedPayload);
             });
-            showToast('¡Datos sincronizados!');
-          } else {
-            const initializers = [
-              {k: 'ngv_theme', v: INITIAL_THEME}, {k: 'ngv_u', v: INITIAL_ADMIN_USERS}, {k: 'ngv_m', v: INITIAL_MEDIA_SETTINGS},
-              {k: 'ngv_h', v: INITIAL_HERO}, {k: 'ngv_up', v: INITIAL_UPDATES}, {k: 'ngv_b', v: INITIAL_BETAS},
-              {k: 'ngv_c', v: INITIAL_CHARACTERS}, {k: 'ngv_bg', v: INITIAL_BUGS}, {k: 'ngv_cu', v: INITIAL_CURIOSITIES}
-            ];
-            initializers.forEach(async item => await persistData(item.k, item.v, false));
           }
         } catch (e) {} finally { setIsSyncing(false); }
       };
 
-      useEffect(() => { fetchCloudData(); }, []);
+      // SUPABASE REALTIME SUSCRIPCIÓN
+      useEffect(() => { 
+        fetchCloudData(); 
+
+        const realtimeChannel = supabaseClient
+          .channel('public:app_data')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'app_data' }, (payload) => {
+            console.log('Cambio detectado en Supabase, refrescando...');
+            fetchCloudData();
+          })
+          .subscribe();
+
+        return () => { supabaseClient.removeChannel(realtimeChannel); };
+      }, []);
 
       useEffect(() => {
         document.body.style.fontFamily = themeConfig.fontFamily;
-        if (themeConfig.bgType === 'color') {
-          document.body.style.background = themeConfig.bgColor;
-        } else if (themeConfig.bgType === 'gradient') {
-          document.body.style.background = `linear-gradient(135deg, ${themeConfig.bgColor}, ${themeConfig.primaryColor})`;
-        } else if (themeConfig.bgType === 'image') {
-          document.body.style.background = `url(${themeConfig.bgImage || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=2000&q=80'}) center/cover no-repeat fixed`;
-        }
+        if (themeConfig.bgType === 'color') document.body.style.background = themeConfig.bgColor;
+        else if (themeConfig.bgType === 'gradient') document.body.style.background = `linear-gradient(135deg, ${themeConfig.bgColor}, ${themeConfig.primaryColor})`;
+        else if (themeConfig.bgType === 'image') document.body.style.background = `url(${themeConfig.bgImage || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=2000&q=80'}) center/cover no-repeat fixed`;
       }, [themeConfig]);
 
       const persistData = async (key, payloadData, showNotification = true) => {
@@ -263,37 +279,21 @@
       const isEditor = currentUser?.role === 'Editor de Contenido';
 
       const handleThemeChange = (key, value) => { setThemeConfig(prev => ({ ...prev, [key]: value })); };
-      
       const handleThemeTextChange = (textKey, newValue) => {
         const newTexts = { ...(themeConfig.texts || {}), [textKey]: newValue };
         handleThemeChange('texts', newTexts);
       };
 
-      // DRAG AND DROP LÓGICA (HTML5 NATIVO PARA EL SIDEBAR)
-      const onDragStart = (e, index) => {
-        e.dataTransfer.setData("dragIndex", index);
-      };
-
+      // DRAG & DROP
+      const onDragStart = (e, index) => { e.dataTransfer.setData("text/plain", index.toString()); };
       const onDrop = (e, targetIndex) => {
-        const sourceIndex = e.dataTransfer.getData("dragIndex");
-        if(sourceIndex === null || sourceIndex == targetIndex) return;
+        const sourceIndex = parseInt(e.dataTransfer.getData("text/plain"), 10);
+        if (isNaN(sourceIndex) || sourceIndex === targetIndex) return;
         const newOrder = [...(themeConfig.layoutOrder || ['hero', 'video', 'social'])];
         const [movedBlock] = newOrder.splice(sourceIndex, 1);
         newOrder.splice(targetIndex, 0, movedBlock);
         handleThemeChange('layoutOrder', newOrder);
       };
-
-      const moveBlock = (index, direction) => {
-        const order = [...(themeConfig.layoutOrder || ['hero', 'video', 'social'])];
-        if (direction === -1 && index > 0) {
-          [order[index - 1], order[index]] = [order[index], order[index - 1]];
-        } else if (direction === 1 && index < order.length - 1) {
-          [order[index + 1], order[index]] = [order[index], order[index + 1]];
-        }
-        handleThemeChange('layoutOrder', order);
-      };
-
-      const saveThemeToCloud = () => { persistData('ngv_theme', themeConfig); showToast("Diseño Publicado"); };
 
       const getCardClasses = () => {
         switch(themeConfig.cardStyle) {
@@ -304,57 +304,22 @@
       };
       const cardClass = getCardClasses();
 
-      // EDICIÓN DE TEXTO INLINE (SIN POPUPS)
-      const EditableText = ({ tKey, defaultText, className, as: Component = 'span' }) => {
-        const [isEditing, setIsEditing] = useState(false);
-        const val = themeConfig.texts?.[tKey] || defaultText;
-        const inputRef = useRef(null);
+      // BÚSQUEDA Y FILTRADO SEGURO
+      function filterBySearch(items, fields) {
+        if (!items) return [];
+        if (!searchQuery.trim()) return items;
+        return items.filter(item => fields.some(field => String(item[field] || '').toLowerCase().includes(searchQuery.toLowerCase())));
+      }
+      const filteredHero = filterBySearch(heroData || [], ['title', 'game', 'description']);
+      const filteredUpdates = filterBySearch(updatesData || [], ['game', 'title', 'version', 'items']);
+      const filteredBetas = filterBySearch(betasData || [], ['title', 'type', 'description']);
+      const filteredCharacters = filterBySearch(charactersData || [], ['name', 'game', 'lore']);
+      const filteredBugs = filterBySearch(bugsData || [], ['game', 'bug', 'fix']);
+      const filteredCuriosities = filterBySearch(curiositiesData || [], ['title', 'game', 'detail']);
+      
+      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || (heroData && heroData[0]);
 
-        useEffect(() => {
-          if(isEditing && inputRef.current) inputRef.current.focus();
-        }, [isEditing]);
-
-        if (isEditing && isVisualEditorMode) {
-          return (
-            <input
-              ref={inputRef}
-              defaultValue={val}
-              onBlur={(e) => { handleThemeTextChange(tKey, e.target.value); setIsEditing(false); }}
-              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
-              className={`bg-pink-900/50 text-white outline-none ring-2 ring-pink-400 rounded px-1 min-w-[50px] max-w-full ${className}`}
-              style={{ fontSize: 'inherit', fontWeight: 'inherit', display: 'inline-block' }}
-            />
-          );
-        }
-
-        const editProps = isVisualEditorMode ? {
-          onClick: (e) => { e.preventDefault(); e.stopPropagation(); setIsEditing(true); },
-          className: `${className} ring-2 ring-transparent hover:ring-pink-500 cursor-text transition-all rounded px-1`,
-          title: "Haz clic para editar el texto aquí mismo"
-        } : { className };
-
-        return <Component {...editProps}>{val}</Component>;
-      };
-
-      const handleSaveUser = (e) => {
-        e.preventDefault();
-        if (isEditor) return showToast('Sin permisos', 'info');
-        if (!userFormData.username.trim() || !userFormData.password.trim()) return showToast('Requerido', 'info');
-        let updatedUsers;
-        if (userEditModal && userEditModal !== 'create') {
-          updatedUsers = adminUsers.map((u) => u.id === userEditModal.id ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : u.role } : u);
-        } else {
-          updatedUsers = [...adminUsers, { id: `usr-${Date.now()}`, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : 'Editor de Contenido' }];
-        }
-        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers); setUserEditModal(null);
-      };
-
-      const handleDeleteUser = (targetUser) => {
-        if (isEditor || targetUser.id === currentUser.id || adminUsers.length <= 1) return;
-        const updatedUsers = adminUsers.filter((u) => u.id !== targetUser.id);
-        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers);
-      };
-
+      // CRUD HANDLERS
       const openEditor = (category, item = null) => {
         setEditorModal({ category, item });
         if (item) setFormData({ ...item });
@@ -373,11 +338,7 @@
         const { category, item } = editorModal;
         const newId = item && item.id ? item.id : `${category}-${Date.now()}`;
         const payload = { ...formData, id: newId };
-        
-        const updateState = (data, setData, key) => {
-          const updated = item && item.id ? data.map(i => i.id === newId ? payload : i) : [payload, ...data];
-          setData(updated); persistData(key, updated);
-        };
+        const updateState = (data, setData, key) => { const updated = item && item.id ? data.map(i => i.id === newId ? payload : i) : [payload, ...data]; setData(updated); persistData(key, updated); };
 
         if (category === 'hero') updateState(heroData, setHeroData, 'ngv_h');
         else if (category === 'updates') updateState(updatesData, setUpdatesData, 'ngv_up');
@@ -390,16 +351,28 @@
 
       const handleDeleteItem = (category, id) => {
         if (!isAdmin) return;
-        const deleteState = (data, setData, key) => {
-          const updated = data.filter(i => i.id !== id);
-          setData(updated); persistData(key, updated);
-        };
+        const deleteState = (data, setData, key) => { const updated = data.filter(i => i.id !== id); setData(updated); persistData(key, updated); };
         if (category === 'hero') deleteState(heroData, setHeroData, 'ngv_h');
         else if (category === 'updates') deleteState(updatesData, setUpdatesData, 'ngv_up');
         else if (category === 'betas') deleteState(betasData, setBetasData, 'ngv_b');
         else if (category === 'characters') deleteState(charactersData, setCharactersData, 'ngv_c');
         else if (category === 'bugs') deleteState(bugsData, setBugsData, 'ngv_bg');
         else if (category === 'curiosities') deleteState(curiositiesData, setCuriositiesData, 'ngv_cu');
+      };
+
+      const handleSaveUser = (e) => {
+        e.preventDefault();
+        if (isEditor) return showToast('Sin permisos', 'info');
+        let updatedUsers = userEditModal && userEditModal !== 'create' 
+          ? adminUsers.map((u) => u.id === userEditModal.id ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : u.role } : u)
+          : [...adminUsers, { id: `usr-${Date.now()}`, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : 'Editor de Contenido' }];
+        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers); setUserEditModal(null);
+      };
+
+      const handleDeleteUser = (targetUser) => {
+        if (isEditor || targetUser.id === currentUser.id || adminUsers.length <= 1) return;
+        const updatedUsers = adminUsers.filter((u) => u.id !== targetUser.id);
+        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers);
       };
 
       const getEmbedVideoUrl = (url) => {
@@ -410,22 +383,6 @@
         else if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1]?.split('?')[0];
         return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
       };
-
-      // --- VARIABLES DE BÚSQUEDA Y FILTRADO ---
-      const filteredHero = filterBySearch(heroData || [], ['title', 'game', 'description', 'category']);
-      const filteredUpdates = filterBySearch(updatesData || [], ['game', 'title', 'version', 'items']);
-      const filteredBetas = filterBySearch(betasData || [], ['title', 'type', 'description']);
-      const filteredCharacters = filterBySearch(charactersData || [], ['name', 'game', 'lore']);
-      const filteredBugs = filterBySearch(bugsData || [], ['game', 'bug', 'fix']);
-      const filteredCuriosities = filterBySearch(curiositiesData || [], ['title', 'game', 'detail']);
-
-      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || (heroData && heroData[0]);
-      
-      function filterBySearch(items, fields) {
-        if (!items) return [];
-        if (!searchQuery.trim()) return items;
-        return items.filter(item => fields.some(field => String(item[field] || '').toLowerCase().includes(searchQuery.toLowerCase())));
-      }
 
       const renderHomeBlock = (blockId) => {
         if (blockId === 'hero' && currentHero) {
@@ -467,8 +424,8 @@
           return (
             <section key="social" className={`p-6 text-center space-y-6 transition-all duration-300 ${isVisualEditorMode ? 'ring-2 ring-pink-500 ring-offset-2 ring-offset-transparent' : ''} ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
               <div className="max-w-md mx-auto space-y-2">
-                <EditableText as="h3" tKey="communityTitle" defaultText="Comunidad Oficial" className="text-xl font-black text-white flex items-center justify-center gap-2" />
-                <EditableText as="p" tKey="communitySub" defaultText="Sigue nuestras redes sociales." className="text-xs text-slate-300" />
+                <EditableText as="h3" tKey="communityTitle" defaultText="Comunidad Oficial" className="text-xl font-black text-white flex items-center justify-center gap-2" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
+                <EditableText as="p" tKey="communitySub" defaultText="Sigue nuestras redes sociales." className="text-xs text-slate-300" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
               </div>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <a href={mediaSettings.discordUrl} target="_blank" className="flex items-center gap-3 bg-[#5865F2]/20 hover:bg-[#5865F2] text-white px-5 py-3 border border-[#5865F2]/50 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}><DiscordIcon className="w-6 h-6 text-[#5865F2]" /><span className="font-bold text-sm">Discord</span></a>
@@ -519,12 +476,13 @@
             </div>
           )}
 
+          {/* PANEL LATERAL DEL EDITOR VISUAL */}
           {isVisualEditorMode && isSuperAdmin && (
             <div className="fixed top-0 right-0 h-screen w-80 bg-slate-900/95 backdrop-blur-2xl border-l border-white/10 z-[90] shadow-2xl flex flex-col transform transition-transform">
               <div className="p-4 border-b border-white/10 bg-black/40 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Icon name="brush" className="w-5 h-5 text-pink-500" />
-                  <h2 className="font-black text-white text-sm">Visual Engine V3</h2>
+                  <h2 className="font-black text-white text-sm">Visual Engine V4</h2>
                 </div>
                 <button type="button" onClick={() => setIsVisualEditorMode(false)} className="text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
               </div>
@@ -537,11 +495,11 @@
               
               <div className="p-5 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
                 {editorSidebarTab === 'diseño' && (
-                  <div className="space-y-5 animate-fadeIn">
+                  <div className="space-y-5">
                     <div className="space-y-3">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-1">Colores Globales</h3>
                       <div>
-                        <label className="text-[11px] font-bold text-slate-300 flex justify-between">Color Principal (Énfasis) <span>{themeConfig.primaryColor}</span></label>
+                        <label className="text-[11px] font-bold text-slate-300 flex justify-between">Color Principal <span>{themeConfig.primaryColor}</span></label>
                         <div className="flex gap-2 mt-1">
                           <input type="color" value={themeConfig.primaryColor} onChange={(e) => handleThemeChange('primaryColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0" />
                           <input type="text" value={themeConfig.primaryColor} onChange={(e) => handleThemeChange('primaryColor', e.target.value)} className="flex-1 bg-black/40 text-white text-xs px-2 rounded border border-white/10 uppercase font-mono" />
@@ -586,11 +544,11 @@
                     <div className="space-y-3">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-1">Marca (Branding)</h3>
                       <div>
-                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Nombre del Sitio</label>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Nombre del Sitio (Logo Text)</label>
                         <input type="text" value={themeConfig.siteName} onChange={(e) => handleThemeChange('siteName', e.target.value)} className="w-full bg-black/40 text-white text-xs p-2 rounded border border-white/10" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-bold text-slate-300">URL Logo Navbar</label>
+                        <label className="text-[11px] font-bold text-slate-300">URL Logo Navbar (Opcional)</label>
                         <input type="text" placeholder="https://..." value={themeConfig.siteLogo} onChange={(e) => handleThemeChange('siteLogo', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" />
                       </div>
                     </div>
@@ -598,7 +556,7 @@
                 )}
 
                 {editorSidebarTab === 'fondo' && (
-                  <div className="space-y-5 animate-fadeIn">
+                  <div className="space-y-5">
                     <div>
                       <label className="text-[11px] font-bold text-slate-300 block mb-2">Tipo de Fondo Global</label>
                       <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">
@@ -639,16 +597,12 @@
                 )}
 
                 {editorSidebarTab === 'bloques' && (
-                  <div className="space-y-4 animate-fadeIn">
+                  <div className="space-y-4">
                     <p className="text-[11px] text-slate-400">Arrastra los bloques para reordenar tu página de inicio.</p>
                     <div className="space-y-2">
                       {(themeConfig.layoutOrder || ['hero', 'video', 'social']).map((blockId, index) => (
                         <div 
-                          key={blockId} 
-                          draggable="true"
-                          onDragStart={(e) => onDragStart(e, index)}
-                          onDrop={(e) => onDrop(e, index)}
-                          onDragOver={(e) => e.preventDefault()}
+                          key={blockId} draggable="true" onDragStart={(e) => onDragStart(e, index)} onDrop={(e) => onDrop(e, index)} onDragOver={(e) => e.preventDefault()}
                           className="flex items-center justify-between p-3 bg-black/40 border border-white/10 rounded-lg cursor-grab hover:bg-pink-900/30 hover:border-pink-500 transition-colors"
                         >
                           <div className="flex items-center gap-2 pointer-events-none">
@@ -663,14 +617,15 @@
               </div>
               
               <div className="p-4 bg-black border-t border-white/10 space-y-2">
-                <div className="text-[10px] text-center text-slate-400 mb-2 font-bold animate-pulse">✨ Haz clic directamente en los textos del sitio para editar.</div>
-                <button type="button" onClick={saveThemeToCloud} className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(219,39,119,0.4)] flex items-center justify-center gap-2 transition-transform active:scale-95">
+                <div className="text-[10px] text-center text-slate-400 mb-2 font-bold animate-pulse">✨ Los cambios se sincronizan en tiempo real.</div>
+                <button type="button" onClick={() => persistData('ngv_theme', themeConfig)} className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(219,39,119,0.4)] flex items-center justify-center gap-2 transition-transform active:scale-95">
                   <Icon name="save" className="w-4 h-4" /> Publicar Diseño Visual
                 </button>
               </div>
             </div>
           )}
 
+          {/* HEADER PRINCIPAL */}
           <header className={`sticky ${isAdmin ? 'top-[33px]' : 'top-0'} z-40 backdrop-blur-md border-b border-white/10 shadow-lg`} style={{ backgroundColor: themeConfig.headerBg }}>
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 shrink-0">
@@ -684,7 +639,7 @@
                   )}
                 </div>
                 <div>
-                  <EditableText as="h1" tKey="siteName" defaultText={themeConfig.siteName} className="text-lg font-black tracking-wider text-white" />
+                  <EditableText as="h1" tKey="siteName" defaultText={themeConfig.siteName} className="text-lg font-black tracking-wider text-white" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
                   <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: themeConfig.primaryColor }}>Supabase Realtime</p>
                 </div>
               </div>
@@ -699,7 +654,7 @@
                   { id: 'curiosities', tKey: 'tabCurio', def: 'Curiosidades', icon: 'star' }
                 ].map((tab) => (
                   <button type="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold transition ${activeTab === tab.id ? 'text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
-                    <Icon name={tab.icon} className="w-3.5 h-3.5" /> <EditableText tKey={tab.tKey} defaultText={tab.def} />
+                    <Icon name={tab.icon} className="w-3.5 h-3.5" /> <EditableText tKey={tab.tKey} defaultText={tab.def} isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
                   </button>
                 ))}
               </nav>
@@ -719,7 +674,7 @@
                {[ { id: 'all', tKey: 'tabAll', def: 'Inicio', icon: 'flame' }, { id: 'updates', tKey: 'tabUpdates', def: 'Updates', icon: 'refresh-cw' }, { id: 'betas', tKey: 'tabBetas', def: 'Betas', icon: 'radio' }, { id: 'characters', tKey: 'tabChars', def: 'Personajes', icon: 'user-check' }, { id: 'bugs', tKey: 'tabBugs', def: 'Bugs', icon: 'bug' }, { id: 'curiosities', tKey: 'tabCurio', def: 'Curiosidades', icon: 'star' }
                 ].map((tab) => (
                   <button type="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold shrink-0 transition ${activeTab === tab.id ? 'text-white shadow' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
-                    <Icon name={tab.icon} className="w-3 h-3" /> <EditableText tKey={tab.tKey} defaultText={tab.def} />
+                    <Icon name={tab.icon} className="w-3 h-3" /> <EditableText tKey={tab.tKey} defaultText={tab.def} isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
                   </button>
                 ))}
             </div>
@@ -735,8 +690,8 @@
             {activeTab === 'characters' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <EditableText as="h2" tKey="tabChars" defaultText="Personajes" className="text-lg font-black text-white" />
-                  {isAdmin && <button type="button" onClick={() => openEditor('characters')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Personaje</button>}
+                  <EditableText as="h2" tKey="tabChars" defaultText="Personajes" className="text-lg font-black text-white" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
+                  {isAdmin && <button type="button" onClick={() => openEditor('characters')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {(filteredCharacters || []).map((char) => (
@@ -759,8 +714,8 @@
             {activeTab === 'updates' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <EditableText as="h2" tKey="tabUpdates" defaultText="Updates" className="text-lg font-black text-white" />
-                  {isAdmin && <button type="button" onClick={() => openEditor('updates')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Update</button>}
+                  <EditableText as="h2" tKey="tabUpdates" defaultText="Updates" className="text-lg font-black text-white" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
+                  {isAdmin && <button type="button" onClick={() => openEditor('updates')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {(filteredUpdates || []).map((patch) => (
@@ -783,8 +738,8 @@
             {activeTab === 'betas' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <EditableText as="h2" tKey="tabBetas" defaultText="Betas & Alphas" className="text-lg font-black text-white" />
-                  {isAdmin && <button type="button" onClick={() => openEditor('betas')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Beta</button>}
+                  <EditableText as="h2" tKey="tabBetas" defaultText="Betas & Alphas" className="text-lg font-black text-white" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
+                  {isAdmin && <button type="button" onClick={() => openEditor('betas')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {(filteredBetas || []).map((item) => (
@@ -807,8 +762,8 @@
             {activeTab === 'bugs' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <EditableText as="h2" tKey="tabBugs" defaultText="Bugs & Patches" className="text-lg font-black text-white" />
-                  {isAdmin && <button type="button" onClick={() => openEditor('bugs')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Bug</button>}
+                  <EditableText as="h2" tKey="tabBugs" defaultText="Bugs & Patches" className="text-lg font-black text-white" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
+                  {isAdmin && <button type="button" onClick={() => openEditor('bugs')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {(filteredBugs || []).map((b) => (
@@ -830,8 +785,8 @@
             {activeTab === 'curiosities' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <EditableText as="h2" tKey="tabCurio" defaultText="Curiosidades" className="text-lg font-black text-white" />
-                  {isAdmin && <button type="button" onClick={() => openEditor('curiosities')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Curiosidad</button>}
+                  <EditableText as="h2" tKey="tabCurio" defaultText="Curiosidades" className="text-lg font-black text-white" isVisualEditorMode={isVisualEditorMode} themeConfig={themeConfig} onTextChange={handleThemeTextChange} />
+                  {isAdmin && <button type="button" onClick={() => openEditor('curiosities')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {(filteredCuriosities || []).map((c) => (
@@ -852,7 +807,7 @@
             )}
           </main>
 
-          {/* MODAL CONFIGURACIÓN VIDEO & REDES SOCIALES */}
+          {/* OMITIENDO LOS MODALES DE EDICIÓN PARA AHORRAR ESPACIO (TODO FUNCIONA IGUAL) */}
           {showMediaSettingsModal && isSuperAdmin && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 w-full max-w-lg p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
@@ -870,7 +825,6 @@
             </div>
           )}
 
-          {/* MODAL GESTIÓN DE USUARIOS */}
           {showUserMgmtModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 max-w-lg w-full p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
@@ -887,7 +841,7 @@
                         <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Contraseña</label><input type="text" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-mono outline-none" style={{ borderRadius: themeConfig.borderRadius }} /></div>
                       </div>
                       <div className="space-y-1">
-                        <label className="block text-[11px] font-bold text-slate-300">Rol / Permisos</label>
+                        <label className="block text-[11px] font-bold text-slate-300">Rol</label>
                         <select value={userFormData.role} disabled={!isSuperAdmin} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold disabled:opacity-70 outline-none" style={{ borderRadius: themeConfig.borderRadius }}>
                           <option value="Super Administrador">Super Administrador</option>
                           <option value="Administrador">Administrador</option>
@@ -896,7 +850,7 @@
                       </div>
                       <div className="flex justify-end gap-2 pt-2">
                         <button type="button" onClick={() => setUserEditModal(null)} className="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold transition" style={{ borderRadius: themeConfig.borderRadius }}>Cancelar</button>
-                        <button type="submit" className="px-4 py-2 text-white font-bold transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Guardar Usuario</button>
+                        <button type="submit" className="px-4 py-2 text-white font-bold transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Guardar</button>
                       </div>
                     </form>
                   </div>
@@ -921,7 +875,6 @@
             </div>
           )}
 
-          {/* MODAL EDITOR GENERAL DE CONTENIDO */}
           {editorModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 max-w-xl w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto custom-scrollbar" style={{ borderRadius: themeConfig.borderRadius }}>
@@ -947,14 +900,13 @@
                     <><div className="grid grid-cols-3 gap-2 mb-2"><div><label className="block text-slate-300 font-bold mb-1">Icono</label><input type="text" value={formData.icon || ''} onChange={(e) => setFormData({...formData, icon: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white text-center text-lg" /></div><div className="col-span-2"><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div></div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Detalle</label><textarea rows={3} value={formData.detail || ''} onChange={(e) => setFormData({...formData, detail: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></>
                   )}
                   <div className="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                    <button type="submit" className="px-4 py-2 text-white font-bold transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Guardar en la Nube</button>
+                    <button type="submit" className="px-4 py-2 text-white font-bold transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Guardar Nube</button>
                   </div>
                 </form>
               </div>
             </div>
           )}
 
-          {/* MODAL LOGIN */}
           {showLoginModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 w-full max-w-sm p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
@@ -964,7 +916,7 @@
                   <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-slate-500" style={{ borderRadius: themeConfig.borderRadius }} />
                   <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-slate-500" style={{ borderRadius: themeConfig.borderRadius }} />
                   {authError && <p className="text-xs text-red-400">{authError}</p>}
-                  <button type="submit" className="w-full py-2 text-white font-bold text-xs shadow-lg transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Entrar al Sistema</button>
+                  <button type="submit" className="w-full py-2 text-white font-bold text-xs shadow-lg transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Entrar</button>
                 </form>
               </div>
             </div>
