@@ -29,17 +29,25 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrcnRlbGtodWZnb3Juc2Nqcm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3OTc0MzksImV4cCI6MjEwODM3MzQzOX0.GiSFTIPiQTUyEIcNlzAoJ7nxm-o2bzPPmHzb7HIkVaA';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // COMPONENTE DE ICONOS SEGURO PARA REACT
     const Icon = ({ name, className = "w-4 h-4" }) => {
-      const ref = useRef(null);
-      useEffect(() => { if (window.lucide && ref.current) window.lucide.createIcons(); }, [name]);
-      return <i ref={ref} data-lucide={name} className={className}></i>;
+      const iconRef = useRef(null);
+      useEffect(() => {
+        if (window.lucide && iconRef.current) {
+          window.lucide.createIcons({
+            attrs: { class: className },
+            nameAttr: 'data-lucide',
+            root: iconRef.current.parentElement
+          });
+        }
+      }, [name, className]);
+      return <i ref={iconRef} data-lucide={name} className={className}></i>;
     };
 
     const DiscordIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>;
     const InstagramIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>;
     const TikTokIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.82.12V9.4a6.33 6.33 0 0 0-1-.08A6.26 6.26 0 0 0 3 15.57a6.26 6.26 0 0 0 10.68 4.43V12.1a8.23 8.23 0 0 0 5.91 2.38v-3.46a4.85 4.85 0 0 1-3.23-1.38z"/></svg>;
 
-    // --- CANVAS BACKGROUND ---
     const BubbleCanvas = ({ config }) => {
       const canvasRef = useRef(null);
       useEffect(() => {
@@ -64,7 +72,7 @@
         };
         const themeColorRGB = hexToRgb(config.primaryColor);
 
-        const numBubbles = Math.min(Math.floor(width / 20), 55);
+        const numBubbles = Math.min(Math.floor(width / 20), 40);
         const bubbles = Array.from({ length: numBubbles }, () => ({
           x: Math.random() * width, y: Math.random() * height,
           radius: Math.random() * 28 + 8, vx: (Math.random() - 0.5) * 0.7, vy: (Math.random() - 0.5) * 0.7,
@@ -123,11 +131,11 @@
     const INITIAL_THEME = {
       primaryColor: '#9333ea',
       bgColor: '#020617',
-      bgType: 'color', // 'color', 'gradient', 'image'
+      bgType: 'color', 
       bgImage: '',
       headerBg: 'rgba(59, 7, 100, 0.9)',
       borderRadius: '1rem',
-      cardStyle: 'glass', // 'glass', 'solid', 'minimal'
+      cardStyle: 'glass', 
       showParticles: true,
       siteName: 'NewGameVerse',
       siteLogo: '',
@@ -156,7 +164,7 @@
       const [isAdmin, setIsAdmin] = useState(false);
       const [currentUser, setCurrentUser] = useState(null);
       const [isVisualEditorMode, setIsVisualEditorMode] = useState(false);
-      const [editorSidebarTab, setEditorSidebarTab] = useState('diseño'); // diseño, contenido, bloques
+      const [editorSidebarTab, setEditorSidebarTab] = useState('diseño'); 
 
       const [showLoginModal, setShowLoginModal] = useState(false);
       const [showUserMgmtModal, setShowUserMgmtModal] = useState(false);
@@ -192,7 +200,7 @@
             data.forEach(row => {
               let parsedPayload = row.payload;
               if (typeof parsedPayload === 'string') { try { parsedPayload = JSON.parse(parsedPayload); } catch(e) {} }
-              if (row.key === 'ngv_theme' && parsedPayload) setThemeConfig({...INITIAL_THEME, ...parsedPayload}); // Merge for backward comp
+              if (row.key === 'ngv_theme' && parsedPayload) setThemeConfig({...INITIAL_THEME, ...parsedPayload}); 
               if (row.key === 'ngv_u' && parsedPayload) setAdminUsers(parsedPayload);
               if (row.key === 'ngv_m' && parsedPayload) setMediaSettings(parsedPayload);
               if (row.key === 'ngv_h' && parsedPayload) setHeroData(parsedPayload);
@@ -204,21 +212,18 @@
             });
             showToast('¡Datos sincronizados!');
           } else {
-            // First time init
             const initializers = [
               {k: 'ngv_theme', v: INITIAL_THEME}, {k: 'ngv_u', v: INITIAL_ADMIN_USERS}, {k: 'ngv_m', v: INITIAL_MEDIA_SETTINGS},
               {k: 'ngv_h', v: INITIAL_HERO}, {k: 'ngv_up', v: INITIAL_UPDATES}, {k: 'ngv_b', v: INITIAL_BETAS},
               {k: 'ngv_c', v: INITIAL_CHARACTERS}, {k: 'ngv_bg', v: INITIAL_BUGS}, {k: 'ngv_cu', v: INITIAL_CURIOSITIES}
             ];
             initializers.forEach(async item => await persistData(item.k, item.v, false));
-            showToast('¡Base de datos inicializada!');
           }
         } catch (e) {} finally { setIsSyncing(false); }
       };
 
       useEffect(() => { fetchCloudData(); }, []);
 
-      // APPLY GLOBAL STYLES (Background & Font)
       useEffect(() => {
         document.body.style.fontFamily = themeConfig.fontFamily;
         if (themeConfig.bgType === 'color') {
@@ -233,17 +238,17 @@
       const persistData = async (key, payloadData, showNotification = true) => {
         try {
           await supabaseClient.from('app_data').upsert({ key: key, payload: payloadData, updated_at: new Date().toISOString() }, { onConflict: 'key' });
-          if (showNotification) showToast('¡Guardado y sincronizado!');
+          if (showNotification) showToast('¡Guardado!');
         } catch (err) {}
       };
 
       const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
       useEffect(() => {
-        if (heroData.length === 0) return;
+        if (!heroData || heroData.length === 0) return;
         const timer = setInterval(() => setHeroIdx((prev) => (prev + 1) % heroData.length), 6000);
         return () => clearInterval(timer);
-      }, [heroData.length]);
+      }, [heroData]);
 
       const handleAdminLogin = (e) => {
         e.preventDefault();
@@ -251,18 +256,31 @@
         if (foundUser) {
           setIsAdmin(true); setCurrentUser(foundUser); setShowLoginModal(false); setLoginUsername(''); setLoginPassword(''); setAuthError('');
           showToast(`¡Bienvenido/a ${foundUser.username}!`);
-        } else { setAuthError('Usuario o contraseña incorrectos'); }
+        } else { setAuthError('Usuario incorrecto'); }
       };
 
       const isSuperAdmin = currentUser?.role === 'Super Administrador';
       const isEditor = currentUser?.role === 'Editor de Contenido';
 
-      // --- THEME & VISUAL BUILDER HANDLERS ---
       const handleThemeChange = (key, value) => { setThemeConfig(prev => ({ ...prev, [key]: value })); };
       
       const handleThemeTextChange = (textKey, newValue) => {
         const newTexts = { ...(themeConfig.texts || {}), [textKey]: newValue };
         handleThemeChange('texts', newTexts);
+      };
+
+      // DRAG AND DROP LÓGICA (HTML5 NATIVO PARA EL SIDEBAR)
+      const onDragStart = (e, index) => {
+        e.dataTransfer.setData("dragIndex", index);
+      };
+
+      const onDrop = (e, targetIndex) => {
+        const sourceIndex = e.dataTransfer.getData("dragIndex");
+        if(sourceIndex === null || sourceIndex == targetIndex) return;
+        const newOrder = [...(themeConfig.layoutOrder || ['hero', 'video', 'social'])];
+        const [movedBlock] = newOrder.splice(sourceIndex, 1);
+        newOrder.splice(targetIndex, 0, movedBlock);
+        handleThemeChange('layoutOrder', newOrder);
       };
 
       const moveBlock = (index, direction) => {
@@ -277,7 +295,6 @@
 
       const saveThemeToCloud = () => { persistData('ngv_theme', themeConfig); showToast("Diseño Publicado"); };
 
-      // Helper for Box/Card styles
       const getCardClasses = () => {
         switch(themeConfig.cardStyle) {
           case 'solid': return 'bg-slate-900 border border-slate-700 shadow-xl';
@@ -287,44 +304,62 @@
       };
       const cardClass = getCardClasses();
 
-      // INLINE EDITABLE TEXT COMPONENT
+      // EDICIÓN DE TEXTO INLINE (SIN POPUPS)
       const EditableText = ({ tKey, defaultText, className, as: Component = 'span' }) => {
+        const [isEditing, setIsEditing] = useState(false);
         const val = themeConfig.texts?.[tKey] || defaultText;
-        const handleEdit = (e) => {
-          if (!isVisualEditorMode) return;
-          e.preventDefault(); e.stopPropagation();
-          const newVal = prompt('Editar texto (Modo Visual):', val);
-          if (newVal !== null && newVal.trim() !== '') handleThemeTextChange(tKey, newVal);
-        };
-        const editClasses = isVisualEditorMode ? 'ring-2 ring-pink-500 hover:bg-pink-500/20 cursor-text rounded px-1 transition-all' : '';
-        return <Component className={`${className} ${editClasses}`} onClick={handleEdit}>{val}</Component>;
+        const inputRef = useRef(null);
+
+        useEffect(() => {
+          if(isEditing && inputRef.current) inputRef.current.focus();
+        }, [isEditing]);
+
+        if (isEditing && isVisualEditorMode) {
+          return (
+            <input
+              ref={inputRef}
+              defaultValue={val}
+              onBlur={(e) => { handleThemeTextChange(tKey, e.target.value); setIsEditing(false); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+              className={`bg-pink-900/50 text-white outline-none ring-2 ring-pink-400 rounded px-1 min-w-[50px] max-w-full ${className}`}
+              style={{ fontSize: 'inherit', fontWeight: 'inherit', display: 'inline-block' }}
+            />
+          );
+        }
+
+        const editProps = isVisualEditorMode ? {
+          onClick: (e) => { e.preventDefault(); e.stopPropagation(); setIsEditing(true); },
+          className: `${className} ring-2 ring-transparent hover:ring-pink-500 cursor-text transition-all rounded px-1`,
+          title: "Haz clic para editar el texto aquí mismo"
+        } : { className };
+
+        return <Component {...editProps}>{val}</Component>;
       };
 
-      // Rest of CRUD Handlers (Users, Updates, etc) omitted from comments, fully functional below
       const handleSaveUser = (e) => {
         e.preventDefault();
-        if (isEditor) return showToast('Los editores no pueden modificar usuarios', 'info');
+        if (isEditor) return showToast('Sin permisos', 'info');
         if (!userFormData.username.trim() || !userFormData.password.trim()) return showToast('Requerido', 'info');
         let updatedUsers;
         if (userEditModal && userEditModal !== 'create') {
           updatedUsers = adminUsers.map((u) => u.id === userEditModal.id ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : u.role } : u);
         } else {
-          if (adminUsers.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase())) return showToast('Ya existe', 'info');
           updatedUsers = [...adminUsers, { id: `usr-${Date.now()}`, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : 'Editor de Contenido' }];
         }
         setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers); setUserEditModal(null);
       };
+
       const handleDeleteUser = (targetUser) => {
         if (isEditor || targetUser.id === currentUser.id || adminUsers.length <= 1) return;
         const updatedUsers = adminUsers.filter((u) => u.id !== targetUser.id);
-        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers); showToast('Eliminado', 'info');
+        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers);
       };
 
       const openEditor = (category, item = null) => {
         setEditorModal({ category, item });
         if (item) setFormData({ ...item });
         else {
-          if (category === 'hero') setFormData({ title: '', category: 'Nueva Noticia', game: 'Juego', date: 'Hoy', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', tag: 'Update', description: '' });
+          if (category === 'hero') setFormData({ title: '', category: 'Noticia', game: 'Juego', date: 'Hoy', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', tag: 'Update', description: '' });
           else if (category === 'updates') setFormData({ game: 'Juego', version: 'v1.0', title: 'Título', items: 'Cambios...' });
           else if (category === 'betas') setFormData({ title: 'Juego', type: 'Beta', description: '' });
           else if (category === 'characters') setFormData({ name: 'Nombre', game: 'Juego', avatar: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80', lore: '' });
@@ -365,7 +400,6 @@
         else if (category === 'characters') deleteState(charactersData, setCharactersData, 'ngv_c');
         else if (category === 'bugs') deleteState(bugsData, setBugsData, 'ngv_bg');
         else if (category === 'curiosities') deleteState(curiositiesData, setCuriositiesData, 'ngv_cu');
-        showToast('Eliminado', 'info');
       };
 
       const getEmbedVideoUrl = (url) => {
@@ -377,14 +411,15 @@
         return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
       };
 
-      const filteredHero = filterBySearch(heroData, ['title', 'game', 'description']);
-      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || heroData[0];
+      const filteredHero = filterBySearch(heroData || [], ['title', 'game', 'description']);
+      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || (heroData && heroData[0]);
+      
       function filterBySearch(items, fields) {
+        if (!items) return [];
         if (!searchQuery.trim()) return items;
         return items.filter(item => fields.some(field => String(item[field] || '').toLowerCase().includes(searchQuery.toLowerCase())));
       }
 
-      // RENDER HOME SECTIONS BASED ON LAYOUT ORDER
       const renderHomeBlock = (blockId) => {
         if (blockId === 'hero' && currentHero) {
           return (
@@ -394,9 +429,9 @@
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                 {isAdmin && (
                   <div className="absolute top-4 right-4 z-20 flex gap-2">
-                    <button onClick={() => openEditor('hero', currentHero)} className="p-2 bg-black/80 text-white rounded-lg border border-white/20 hover:bg-black"><Icon name="edit-3" className="w-4 h-4" /></button>
-                    <button onClick={() => handleDeleteItem('hero', currentHero.id)} className="p-2 bg-red-900 text-white rounded-lg border border-red-400 hover:bg-red-800"><Icon name="trash-2" className="w-4 h-4" /></button>
-                    <button onClick={() => openEditor('hero')} className="flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg border border-emerald-400"><Icon name="plus" className="w-4 h-4" /> Noticia</button>
+                    <button type="button" onClick={() => openEditor('hero', currentHero)} className="p-2 bg-black/80 text-white rounded-lg border border-white/20 hover:bg-black"><Icon name="edit-3" className="w-4 h-4" /></button>
+                    <button type="button" onClick={() => handleDeleteItem('hero', currentHero.id)} className="p-2 bg-red-900 text-white rounded-lg border border-red-400 hover:bg-red-800"><Icon name="trash-2" className="w-4 h-4" /></button>
+                    <button type="button" onClick={() => openEditor('hero')} className="flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg border border-emerald-400"><Icon name="plus" className="w-4 h-4" /> Noticia</button>
                   </div>
                 )}
                 <div className="absolute bottom-6 left-6 right-6 space-y-3 z-10">
@@ -413,7 +448,7 @@
             <section key="video" className={`p-6 space-y-6 transition-all duration-300 ${isVisualEditorMode ? 'ring-2 ring-pink-500 ring-offset-2 ring-offset-transparent' : ''} ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
               <div className="flex justify-between items-center border-b border-white/10 pb-4">
                 <h2 className="text-xl font-black text-white">{mediaSettings.videoTitle}</h2>
-                {isSuperAdmin && <button onClick={() => setShowMediaSettingsModal(true)} className="text-white text-xs font-bold px-3 py-2 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Cambiar Video</button>}
+                {isSuperAdmin && <button type="button" onClick={() => setShowMediaSettingsModal(true)} className="text-white text-xs font-bold px-3 py-2 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Cambiar Video</button>}
               </div>
               <div className="relative w-full overflow-hidden aspect-video bg-black" style={{ borderRadius: themeConfig.borderRadius }}>
                 <iframe src={getEmbedVideoUrl(mediaSettings.videoUrl)} className="w-full h-full border-0" allowFullScreen />
@@ -443,7 +478,6 @@
         <div className={`relative pb-16 transition-all duration-300 ${isVisualEditorMode ? 'pr-80' : ''}`}>
           <BubbleCanvas config={themeConfig} />
 
-          {/* Notificaciones */}
           {toast && (
             <div className="fixed top-4 right-4 z-[9999] animate-bounce">
               <div className={`px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-2 text-xs font-bold text-white ${toast.type === 'info' ? 'bg-indigo-900 border-indigo-400' : 'bg-emerald-900 border-emerald-400'}`}>
@@ -452,7 +486,6 @@
             </div>
           )}
 
-          {/* TOP BAR ADMIN */}
           {isAdmin && (
             <div className="bg-slate-900/90 backdrop-blur border-b border-white/10 py-1.5 px-4 sticky top-0 z-[100] text-xs flex items-center justify-between shadow-lg">
               <div className="flex items-center gap-2 text-slate-300">
@@ -461,44 +494,41 @@
               </div>
               <div className="flex items-center gap-2">
                 {isSuperAdmin && (
-                  <button onClick={() => setIsVisualEditorMode(!isVisualEditorMode)} className={`flex items-center gap-1.5 px-3 py-1 rounded-md border text-[11px] font-bold transition-all ${isVisualEditorMode ? 'bg-pink-600 border-pink-400 text-white shadow-[0_0_10px_rgba(219,39,119,0.5)] animate-pulse' : 'bg-indigo-600 border-indigo-400 hover:bg-indigo-500 text-white'}`}>
+                  <button type="button" onClick={() => setIsVisualEditorMode(!isVisualEditorMode)} className={`flex items-center gap-1.5 px-3 py-1 rounded-md border text-[11px] font-bold transition-all ${isVisualEditorMode ? 'bg-pink-600 border-pink-400 text-white shadow-[0_0_10px_rgba(219,39,119,0.5)]' : 'bg-indigo-600 border-indigo-400 hover:bg-indigo-500 text-white'}`}>
                     <Icon name={isVisualEditorMode ? 'x-circle' : 'layout-template'} className="w-3.5 h-3.5" />
                     {isVisualEditorMode ? 'Cerrar Motor Visual' : 'Motor Constructor Visual'}
                   </button>
                 )}
-                <button onClick={fetchCloudData} disabled={isSyncing} className="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded border border-emerald-400/50 text-[11px] font-bold disabled:opacity-50">
+                <button type="button" onClick={fetchCloudData} disabled={isSyncing} className="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded border border-emerald-400/50 text-[11px] font-bold disabled:opacity-50">
                   <Icon name="refresh-cw" className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} /> Sincronizar
                 </button>
-                <button onClick={() => setShowUserMgmtModal(true)} className="flex items-center gap-1 bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded border border-indigo-400/50 text-[11px] font-bold">
+                <button type="button" onClick={() => setShowUserMgmtModal(true)} className="flex items-center gap-1 bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded border border-indigo-400/50 text-[11px] font-bold">
                   <Icon name="users" className="w-3.5 h-3.5" /> Usuarios
                 </button>
-                <button onClick={() => { setIsAdmin(false); setCurrentUser(null); setIsVisualEditorMode(false); }} className="flex items-center gap-1 bg-red-900/80 hover:bg-red-800 text-white px-2.5 py-1 rounded border border-red-400/40 text-[11px]">
+                <button type="button" onClick={() => { setIsAdmin(false); setCurrentUser(null); setIsVisualEditorMode(false); }} className="flex items-center gap-1 bg-red-900/80 hover:bg-red-800 text-white px-2.5 py-1 rounded border border-red-400/40 text-[11px]">
                   <Icon name="log-out" className="w-3 h-3" /> Salir
                 </button>
               </div>
             </div>
           )}
 
-          {/* VISUAL BUILDER SIDEBAR (WIX/WEBFLOW STYLE) */}
           {isVisualEditorMode && isSuperAdmin && (
             <div className="fixed top-0 right-0 h-screen w-80 bg-slate-900/95 backdrop-blur-2xl border-l border-white/10 z-[90] shadow-2xl flex flex-col transform transition-transform">
               <div className="p-4 border-b border-white/10 bg-black/40 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Icon name="brush" className="w-5 h-5 text-pink-500" />
-                  <h2 className="font-black text-white text-sm">Visual Engine V2</h2>
+                  <h2 className="font-black text-white text-sm">Visual Engine V3</h2>
                 </div>
-                <button onClick={() => setIsVisualEditorMode(false)} className="text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
+                <button type="button" onClick={() => setIsVisualEditorMode(false)} className="text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
               </div>
 
-              {/* Builder Tabs */}
-              <div className="flex border-b border-white/10 bg-slate-900 text-xs font-bold">
+              <div className="flex border-b border-white/10 bg-slate-900 text-[11px] font-bold">
                 {['diseño', 'fondo', 'bloques'].map(tab => (
-                  <button key={tab} onClick={() => setEditorSidebarTab(tab)} className={`flex-1 py-2.5 uppercase tracking-wider transition ${editorSidebarTab === tab ? 'text-pink-400 border-b-2 border-pink-500 bg-black/20' : 'text-slate-500 hover:text-slate-300'}`}>{tab}</button>
+                  <button type="button" key={tab} onClick={() => setEditorSidebarTab(tab)} className={`flex-1 py-2 uppercase tracking-wider transition ${editorSidebarTab === tab ? 'text-pink-400 border-b-2 border-pink-500 bg-black/20' : 'text-slate-500 hover:text-slate-300'}`}>{tab}</button>
                 ))}
               </div>
               
               <div className="p-5 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
-                
                 {editorSidebarTab === 'diseño' && (
                   <div className="space-y-5 animate-fadeIn">
                     <div className="space-y-3">
@@ -512,7 +542,7 @@
                       </div>
                       <div>
                         <label className="text-[11px] font-bold text-slate-300">Fondo Barra Cabecera (CSS)</label>
-                        <input type="text" value={themeConfig.headerBg} onChange={(e) => handleThemeChange('headerBg', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" placeholder="rgba(0,0,0,0.5)" />
+                        <input type="text" value={themeConfig.headerBg} onChange={(e) => handleThemeChange('headerBg', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" />
                       </div>
                     </div>
 
@@ -549,11 +579,11 @@
                     <div className="space-y-3">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-1">Marca (Branding)</h3>
                       <div>
-                        <EditableText as="label" tKey="siteName" defaultText={themeConfig.siteName} className="text-[11px] font-bold text-slate-300 block mb-1" />
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">Nombre del Sitio</label>
                         <input type="text" value={themeConfig.siteName} onChange={(e) => handleThemeChange('siteName', e.target.value)} className="w-full bg-black/40 text-white text-xs p-2 rounded border border-white/10" />
                       </div>
                       <div>
-                        <label className="text-[11px] font-bold text-slate-300">URL Logo Navbar (Dejar vacío para Icono)</label>
+                        <label className="text-[11px] font-bold text-slate-300">URL Logo Navbar</label>
                         <input type="text" placeholder="https://..." value={themeConfig.siteLogo} onChange={(e) => handleThemeChange('siteLogo', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" />
                       </div>
                     </div>
@@ -566,7 +596,7 @@
                       <label className="text-[11px] font-bold text-slate-300 block mb-2">Tipo de Fondo Global</label>
                       <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">
                         {['color', 'gradient', 'image'].map(type => (
-                          <button key={type} onClick={() => handleThemeChange('bgType', type)} className={`flex-1 text-xs py-1.5 rounded transition capitalize ${themeConfig.bgType === type ? 'bg-pink-600 text-white font-bold' : 'text-slate-400 hover:text-white'}`}>{type}</button>
+                          <button type="button" key={type} onClick={() => handleThemeChange('bgType', type)} className={`flex-1 text-xs py-1.5 rounded transition capitalize ${themeConfig.bgType === type ? 'bg-pink-600 text-white font-bold' : 'text-slate-400 hover:text-white'}`}>{type}</button>
                         ))}
                       </div>
                     </div>
@@ -578,12 +608,6 @@
                           <input type="color" value={themeConfig.bgColor} onChange={(e) => handleThemeChange('bgColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0" />
                           <input type="text" value={themeConfig.bgColor} onChange={(e) => handleThemeChange('bgColor', e.target.value)} className="flex-1 bg-black/40 text-white text-xs px-2 rounded border border-white/10 font-mono uppercase" />
                         </div>
-                      </div>
-                    )}
-
-                    {themeConfig.bgType === 'gradient' && (
-                      <div className="p-3 bg-black/20 border border-white/5 rounded text-xs text-slate-300">
-                        El degradado se genera automáticamente combinando tu <strong>Color de Fondo ({themeConfig.bgColor})</strong> y tu <strong>Color Principal ({themeConfig.primaryColor})</strong>.
                       </div>
                     )}
 
@@ -609,17 +633,20 @@
 
                 {editorSidebarTab === 'bloques' && (
                   <div className="space-y-4 animate-fadeIn">
-                    <p className="text-[11px] text-slate-400">Arrastra (o usa las flechas) para reordenar las secciones de la página de Inicio.</p>
+                    <p className="text-[11px] text-slate-400">Arrastra los bloques para reordenar tu página de inicio.</p>
                     <div className="space-y-2">
-                      {(themeConfig.layoutOrder || ['hero', 'video', 'social']).map((blockId, index, arr) => (
-                        <div key={blockId} className="flex items-center justify-between p-3 bg-black/40 border border-white/10 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Icon name="layout" className="w-4 h-4 text-pink-400" />
+                      {(themeConfig.layoutOrder || ['hero', 'video', 'social']).map((blockId, index) => (
+                        <div 
+                          key={blockId} 
+                          draggable="true"
+                          onDragStart={(e) => onDragStart(e, index)}
+                          onDrop={(e) => onDrop(e, index)}
+                          onDragOver={(e) => e.preventDefault()}
+                          className="flex items-center justify-between p-3 bg-black/40 border border-white/10 rounded-lg cursor-grab hover:bg-pink-900/30 hover:border-pink-500 transition-colors"
+                        >
+                          <div className="flex items-center gap-2 pointer-events-none">
+                            <Icon name="grip-vertical" className="w-4 h-4 text-slate-500" />
                             <span className="text-xs font-bold text-white capitalize">{blockId === 'hero' ? 'Banner Principal (Hero)' : blockId === 'video' ? 'Reproductor de Video' : 'Redes Sociales'}</span>
-                          </div>
-                          <div className="flex gap-1">
-                            <button onClick={() => moveBlock(index, -1)} disabled={index === 0} className="p-1 text-slate-400 hover:text-white hover:bg-white/10 rounded disabled:opacity-30"><Icon name="chevron-up" className="w-4 h-4" /></button>
-                            <button onClick={() => moveBlock(index, 1)} disabled={index === arr.length - 1} className="p-1 text-slate-400 hover:text-white hover:bg-white/10 rounded disabled:opacity-30"><Icon name="chevron-down" className="w-4 h-4" /></button>
                           </div>
                         </div>
                       ))}
@@ -629,15 +656,14 @@
               </div>
               
               <div className="p-4 bg-black border-t border-white/10 space-y-2">
-                <div className="text-[10px] text-center text-slate-400 mb-2 font-bold animate-pulse">✨ Haz clic en cualquier texto rosa para editarlo en vivo.</div>
-                <button onClick={saveThemeToCloud} className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(219,39,119,0.4)] flex items-center justify-center gap-2 transition-transform active:scale-95">
+                <div className="text-[10px] text-center text-slate-400 mb-2 font-bold animate-pulse">✨ Haz clic directamente en los textos del sitio para editar.</div>
+                <button type="button" onClick={saveThemeToCloud} className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(219,39,119,0.4)] flex items-center justify-center gap-2 transition-transform active:scale-95">
                   <Icon name="save" className="w-4 h-4" /> Publicar Diseño Visual
                 </button>
               </div>
             </div>
           )}
 
-          {/* HEADER MAIN */}
           <header className={`sticky ${isAdmin ? 'top-[33px]' : 'top-0'} z-40 backdrop-blur-md border-b border-white/10 shadow-lg`} style={{ backgroundColor: themeConfig.headerBg }}>
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 shrink-0">
@@ -656,7 +682,6 @@
                 </div>
               </div>
 
-              {/* MENÚ DESKTOP */}
               <nav className="hidden lg:flex items-center gap-1 bg-black/30 p-1 border border-white/10" style={{ borderRadius: themeConfig.borderRadius }}>
                 {[
                   { id: 'all', tKey: 'tabAll', def: 'Inicio', icon: 'flame' },
@@ -666,7 +691,7 @@
                   { id: 'bugs', tKey: 'tabBugs', def: 'Bugs & Patches', icon: 'bug' },
                   { id: 'curiosities', tKey: 'tabCurio', def: 'Curiosidades', icon: 'star' }
                 ].map((tab) => (
-                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold transition ${activeTab === tab.id ? 'text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
+                  <button type="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold transition ${activeTab === tab.id ? 'text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
                     <Icon name={tab.icon} className="w-3.5 h-3.5" /> <EditableText tKey={tab.tKey} defaultText={tab.def} />
                   </button>
                 ))}
@@ -678,16 +703,15 @@
                   <input type="text" placeholder={themeConfig.texts?.searchPlaceholder || 'Buscar juegos...'} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-black/40 border border-white/10 pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1" style={{ borderRadius: themeConfig.borderRadius, borderBottomColor: themeConfig.primaryColor }} />
                 </div>
                 {!isAdmin && (
-                  <button onClick={() => setShowLoginModal(true)} className="p-2 bg-black/40 hover:bg-black/60 text-slate-300 hover:text-white border border-white/10 transition" style={{ borderRadius: themeConfig.borderRadius }}><Icon name="key" className="w-4 h-4" /></button>
+                  <button type="button" onClick={() => setShowLoginModal(true)} className="p-2 bg-black/40 hover:bg-black/60 text-slate-300 hover:text-white border border-white/10 transition" style={{ borderRadius: themeConfig.borderRadius }}><Icon name="key" className="w-4 h-4" /></button>
                 )}
               </div>
             </div>
             
-            {/* MOBILE TABS */}
             <div className="lg:hidden bg-black/50 border-t border-white/10 px-2 py-2 flex items-center justify-between overflow-x-auto gap-1 no-scrollbar">
                {[ { id: 'all', tKey: 'tabAll', def: 'Inicio', icon: 'flame' }, { id: 'updates', tKey: 'tabUpdates', def: 'Updates', icon: 'refresh-cw' }, { id: 'betas', tKey: 'tabBetas', def: 'Betas', icon: 'radio' }, { id: 'characters', tKey: 'tabChars', def: 'Personajes', icon: 'user-check' }, { id: 'bugs', tKey: 'tabBugs', def: 'Bugs', icon: 'bug' }, { id: 'curiosities', tKey: 'tabCurio', def: 'Curiosidades', icon: 'star' }
                 ].map((tab) => (
-                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold shrink-0 transition ${activeTab === tab.id ? 'text-white shadow' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
+                  <button type="button" key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold shrink-0 transition ${activeTab === tab.id ? 'text-white shadow' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
                     <Icon name={tab.icon} className="w-3 h-3" /> <EditableText tKey={tab.tKey} defaultText={tab.def} />
                   </button>
                 ))}
@@ -695,28 +719,26 @@
           </header>
 
           <main className="max-w-7xl mx-auto px-4 py-8 space-y-10 relative z-10">
-            {/* RENDERIZADO DINÁMICO DE INICIO BASADO EN EL ORDEN DEL THEME BUILDER */}
             {activeTab === 'all' && (
               <div className="space-y-10">
                 {(themeConfig.layoutOrder || ['hero', 'video', 'social']).map(block => renderHomeBlock(block))}
               </div>
             )}
 
-            {/* OTRAS PESTAÑAS: Aplican el CardStyle visual dinámicamente */}
             {activeTab === 'characters' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
                   <EditableText as="h2" tKey="tabChars" defaultText="Personajes" className="text-lg font-black text-white" />
-                  {isAdmin && <button onClick={() => openEditor('characters')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Personaje</button>}
+                  {isAdmin && <button type="button" onClick={() => openEditor('characters')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Personaje</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  {filteredCharacters.map((char) => (
+                  {(filteredCharacters || []).map((char) => (
                     <div key={char.id} className={`overflow-hidden relative group transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       <div className="relative h-48"><img src={char.avatar} className="w-full h-full object-cover" />
                         {isAdmin && (
                           <div className="absolute top-3 right-3 flex gap-1 z-20">
-                            <button onClick={() => openEditor('characters', char)} className="p-1.5 bg-black/80 text-white rounded hover:bg-black"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                            <button onClick={() => handleDeleteItem('characters', char.id)} className="p-1.5 bg-red-900/90 text-white rounded hover:bg-red-800"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                            <button type="button" onClick={() => openEditor('characters', char)} className="p-1.5 bg-black/80 text-white rounded hover:bg-black"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                            <button type="button" onClick={() => handleDeleteItem('characters', char.id)} className="p-1.5 bg-red-900/90 text-white rounded hover:bg-red-800"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                           </div>
                         )}
                       </div>
@@ -731,15 +753,15 @@
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
                   <EditableText as="h2" tKey="tabUpdates" defaultText="Updates" className="text-lg font-black text-white" />
-                  {isAdmin && <button onClick={() => openEditor('updates')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Update</button>}
+                  {isAdmin && <button type="button" onClick={() => openEditor('updates')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Update</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {filteredUpdates.map((patch) => (
+                  {(filteredUpdates || []).map((patch) => (
                     <div key={patch.id} className={`p-5 space-y-2 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-4 right-4 flex gap-1">
-                          <button onClick={() => openEditor('updates', patch)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('updates', patch.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => openEditor('updates', patch)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => handleDeleteItem('updates', patch.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <span className="text-xs font-bold font-mono" style={{ color: themeConfig.primaryColor }}>{patch.version}</span>
@@ -755,15 +777,15 @@
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
                   <EditableText as="h2" tKey="tabBetas" defaultText="Betas & Alphas" className="text-lg font-black text-white" />
-                  {isAdmin && <button onClick={() => openEditor('betas')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Beta</button>}
+                  {isAdmin && <button type="button" onClick={() => openEditor('betas')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Beta</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  {filteredBetas.map((item) => (
+                  {(filteredBetas || []).map((item) => (
                     <div key={item.id} className={`p-5 space-y-2 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-4 right-4 flex gap-1">
-                          <button onClick={() => openEditor('betas', item)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('betas', item.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => openEditor('betas', item)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => handleDeleteItem('betas', item.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <span className="text-xs font-bold" style={{ color: themeConfig.primaryColor }}>{item.type}</span>
@@ -779,15 +801,15 @@
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
                   <EditableText as="h2" tKey="tabBugs" defaultText="Bugs & Patches" className="text-lg font-black text-white" />
-                  {isAdmin && <button onClick={() => openEditor('bugs')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Bug</button>}
+                  {isAdmin && <button type="button" onClick={() => openEditor('bugs')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Bug</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  {filteredBugs.map((b) => (
+                  {(filteredBugs || []).map((b) => (
                     <div key={b.id} className={`p-4 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-3 right-3 flex gap-1">
-                          <button onClick={() => openEditor('bugs', b)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('bugs', b.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => openEditor('bugs', b)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => handleDeleteItem('bugs', b.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <h3 className="text-xs font-bold text-white">{b.bug}</h3>
@@ -802,15 +824,15 @@
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
                   <EditableText as="h2" tKey="tabCurio" defaultText="Curiosidades" className="text-lg font-black text-white" />
-                  {isAdmin && <button onClick={() => openEditor('curiosities')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Curiosidad</button>}
+                  {isAdmin && <button type="button" onClick={() => openEditor('curiosities')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Curiosidad</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  {filteredCuriosities.map((c) => (
+                  {(filteredCuriosities || []).map((c) => (
                     <div key={c.id} className={`p-5 space-y-2 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-3 right-3 flex gap-1">
-                          <button onClick={() => openEditor('curiosities', c)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('curiosities', c.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => openEditor('curiosities', c)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => handleDeleteItem('curiosities', c.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <span className="text-xl">{c.icon}</span>
@@ -823,12 +845,11 @@
             )}
           </main>
 
-          {/* OMITIENDO POR ESPACIO MODALES (SON IDÉNTICOS A LOS QUE YA TENÍAS, LA FUNCIONALIDAD SIGUE AQUÍ, SOLO ESTÁN AL FINAL) */}
           {/* MODAL CONFIGURACIÓN VIDEO & REDES SOCIALES */}
           {showMediaSettingsModal && isSuperAdmin && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 w-full max-w-lg p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
-                <button onClick={() => setShowMediaSettingsModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
+                <button type="button" onClick={() => setShowMediaSettingsModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <h3 className="text-base font-black text-white">Configurar Video & Redes</h3>
                 <form onSubmit={(e) => { e.preventDefault(); persistData('ngv_m', mediaSettings); setShowMediaSettingsModal(false); }} className="space-y-3 text-xs">
                   <div><label className="block text-slate-300 font-bold mb-1">Título del Video</label><input type="text" value={mediaSettings.videoTitle} onChange={(e) => setMediaSettings({...mediaSettings, videoTitle: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
@@ -846,21 +867,21 @@
           {showUserMgmtModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 max-w-lg w-full p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
-                <button onClick={() => { setShowUserMgmtModal(false); setUserEditModal(null); }} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
+                <button type="button" onClick={() => { setShowUserMgmtModal(false); setUserEditModal(null); }} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <div className="flex justify-between items-center border-b border-slate-700 pb-3">
                   <h3 className="text-base font-black text-white">Gestión de Usuarios</h3>
-                  {!isEditor && <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Crear Usuario</button>}
+                  {!isEditor && <button type="button" onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Crear Usuario</button>}
                 </div>
                 {userEditModal !== null && !isEditor && (
                   <div className="bg-black/50 border border-slate-700 p-4 space-y-3 text-xs" style={{ borderRadius: themeConfig.borderRadius }}>
                     <form onSubmit={handleSaveUser} className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Usuario</label><input type="text" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold" style={{ borderRadius: themeConfig.borderRadius }} /></div>
-                        <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Contraseña</label><input type="text" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-mono" style={{ borderRadius: themeConfig.borderRadius }} /></div>
+                        <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Usuario</label><input type="text" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold outline-none" style={{ borderRadius: themeConfig.borderRadius }} /></div>
+                        <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Contraseña</label><input type="text" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-mono outline-none" style={{ borderRadius: themeConfig.borderRadius }} /></div>
                       </div>
                       <div className="space-y-1">
                         <label className="block text-[11px] font-bold text-slate-300">Rol / Permisos</label>
-                        <select value={userFormData.role} disabled={!isSuperAdmin} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold disabled:opacity-70" style={{ borderRadius: themeConfig.borderRadius }}>
+                        <select value={userFormData.role} disabled={!isSuperAdmin} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold disabled:opacity-70 outline-none" style={{ borderRadius: themeConfig.borderRadius }}>
                           <option value="Super Administrador">Super Administrador</option>
                           <option value="Administrador">Administrador</option>
                           <option value="Editor de Contenido">Editor de Contenido</option>
@@ -882,8 +903,8 @@
                       </div>
                       {(!isEditor && (isSuperAdmin ? usr.id !== currentUser.id : (usr.role !== 'Administrador' && usr.role !== 'Super Administrador'))) && (
                         <div className="flex gap-1.5">
-                          <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteUser(usr)} className="p-2 bg-red-900 hover:bg-red-800 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                          <button type="button" onClick={() => handleDeleteUser(usr)} className="p-2 bg-red-900 hover:bg-red-800 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                     </div>
@@ -897,7 +918,7 @@
           {editorModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 max-w-xl w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto custom-scrollbar" style={{ borderRadius: themeConfig.borderRadius }}>
-                <button onClick={() => setEditorModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
+                <button type="button" onClick={() => setEditorModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <h3 className="text-base font-black text-white capitalize">Editar ({editorModal.category})</h3>
                 <form onSubmit={handleSaveForm} className="space-y-3 text-xs">
                   {editorModal.category === 'hero' && (
@@ -930,11 +951,11 @@
           {showLoginModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 w-full max-w-sm p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
-                <button onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
+                <button type="button" onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <h3 className="text-lg font-black text-white text-center">Acceso Administrador</h3>
                 <form onSubmit={handleAdminLogin} className="space-y-3">
-                  <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none" style={{ borderRadius: themeConfig.borderRadius }} />
-                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white font-mono focus:outline-none" style={{ borderRadius: themeConfig.borderRadius }} />
+                  <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-slate-500" style={{ borderRadius: themeConfig.borderRadius }} />
+                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-slate-500" style={{ borderRadius: themeConfig.borderRadius }} />
                   {authError && <p className="text-xs text-red-400">{authError}</p>}
                   <button type="submit" className="w-full py-2 text-white font-bold text-xs shadow-lg transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Entrar al Sistema</button>
                 </form>
