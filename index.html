@@ -411,7 +411,14 @@
         return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
       };
 
-      const filteredHero = filterBySearch(heroData || [], ['title', 'game', 'description']);
+      // --- VARIABLES DE BÚSQUEDA Y FILTRADO ---
+      const filteredHero = filterBySearch(heroData || [], ['title', 'game', 'description', 'category']);
+      const filteredUpdates = filterBySearch(updatesData || [], ['game', 'title', 'version', 'items']);
+      const filteredBetas = filterBySearch(betasData || [], ['title', 'type', 'description']);
+      const filteredCharacters = filterBySearch(charactersData || [], ['name', 'game', 'lore']);
+      const filteredBugs = filterBySearch(bugsData || [], ['game', 'bug', 'fix']);
+      const filteredCuriosities = filterBySearch(curiositiesData || [], ['title', 'game', 'detail']);
+
       const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || (heroData && heroData[0]);
       
       function filterBySearch(items, fields) {
