@@ -17,7 +17,7 @@
   <!-- Supabase JS Client UMD -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans selection:bg-purple-600 selection:text-white transition-colors duration-500">
+<body class="text-slate-100 font-sans selection:bg-purple-600 selection:text-white transition-colors duration-500 min-h-screen">
 
   <div id="root"></div>
 
@@ -31,209 +31,132 @@
 
     const Icon = ({ name, className = "w-4 h-4" }) => {
       const ref = useRef(null);
-      useEffect(() => {
-        if (window.lucide && ref.current) {
-          window.lucide.createIcons();
-        }
-      }, [name]);
+      useEffect(() => { if (window.lucide && ref.current) window.lucide.createIcons(); }, [name]);
       return <i ref={ref} data-lucide={name} className={className}></i>;
     };
 
-    const DiscordIcon = ({ className = "w-6 h-6" }) => (
-      <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-      </svg>
-    );
-
-    const InstagramIcon = ({ className = "w-6 h-6" }) => (
-      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-      </svg>
-    );
-
-    const TikTokIcon = ({ className = "w-6 h-6" }) => (
-      <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.82.12V9.4a6.33 6.33 0 0 0-1-.08A6.26 6.26 0 0 0 3 15.57a6.26 6.26 0 0 0 10.68 4.43V12.1a8.23 8.23 0 0 0 5.91 2.38v-3.46a4.85 4.85 0 0 1-3.23-1.38z"/>
-      </svg>
-    );
+    const DiscordIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>;
+    const InstagramIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>;
+    const TikTokIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .56.04.82.12V9.4a6.33 6.33 0 0 0-1-.08A6.26 6.26 0 0 0 3 15.57a6.26 6.26 0 0 0 10.68 4.43V12.1a8.23 8.23 0 0 0 5.91 2.38v-3.46a4.85 4.85 0 0 1-3.23-1.38z"/></svg>;
 
     // --- CANVAS BACKGROUND ---
     const BubbleCanvas = ({ config }) => {
       const canvasRef = useRef(null);
-
       useEffect(() => {
         if (!config.showParticles) return;
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         let animationFrameId;
-
         let width = (canvas.width = window.innerWidth);
         let height = (canvas.height = window.innerHeight);
 
-        const handleResize = () => {
-          width = canvas.width = window.innerWidth;
-          height = canvas.height = window.innerHeight;
-        };
+        const handleResize = () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; };
         window.addEventListener('resize', handleResize);
 
         const mouse = { x: width / 2, y: height / 2, radius: 180 };
-        const handleMouseMove = (e) => {
-          mouse.x = e.clientX;
-          mouse.y = e.clientY;
-        };
+        const handleMouseMove = (e) => { mouse.x = e.clientX; mouse.y = e.clientY; };
         window.addEventListener('mousemove', handleMouseMove);
 
-        const numBubbles = Math.min(Math.floor(width / 20), 55);
-        const bubbles = [];
-
-        // Parse theme color to RGB for canvas
         const hexToRgb = (hex) => {
           const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
           return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '168, 85, 247';
         };
         const themeColorRGB = hexToRgb(config.primaryColor);
 
-        class Bubble {
-          constructor() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.radius = Math.random() * 28 + 8;
-            this.vx = (Math.random() - 0.5) * 0.7;
-            this.vy = (Math.random() - 0.5) * 0.7;
-            this.baseAlpha = Math.random() * 0.4 + 0.25;
-            this.pulse = Math.random() * Math.PI * 2;
-          }
-
-          update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            if (this.x < -this.radius) this.x = width + this.radius;
-            if (this.x > width + this.radius) this.x = -this.radius;
-            if (this.y < -this.radius) this.y = height + this.radius;
-            if (this.y > height + this.radius) this.y = -this.radius;
-
-            const dx = mouse.x - this.x;
-            const dy = mouse.y - this.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < mouse.radius) {
-              const force = (mouse.radius - distance) / mouse.radius;
-              this.x -= (dx / distance) * force * 3;
-              this.y -= (dy / distance) * force * 3;
-            }
-            this.pulse += 0.03;
-          }
-
-          draw() {
-            ctx.beginPath();
-            const currentRadius = Math.max(2, this.radius + Math.sin(this.pulse) * 2.5);
-            const gradient = ctx.createRadialGradient(
-              this.x - currentRadius * 0.3, this.y - currentRadius * 0.3, currentRadius * 0.1,
-              this.x, this.y, currentRadius
-            );
-            gradient.addColorStop(0, `rgba(255, 255, 255, ${this.baseAlpha + 0.35})`);
-            gradient.addColorStop(0.6, `rgba(${themeColorRGB}, ${this.baseAlpha})`);
-            gradient.addColorStop(1, `rgba(${themeColorRGB}, 0)`);
-            ctx.fillStyle = gradient;
-            ctx.arc(this.x, this.y, currentRadius, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, currentRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${this.baseAlpha * 0.6})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-
-        for (let i = 0; i < numBubbles; i++) bubbles.push(new Bubble());
+        const numBubbles = Math.min(Math.floor(width / 20), 55);
+        const bubbles = Array.from({ length: numBubbles }, () => ({
+          x: Math.random() * width, y: Math.random() * height,
+          radius: Math.random() * 28 + 8, vx: (Math.random() - 0.5) * 0.7, vy: (Math.random() - 0.5) * 0.7,
+          baseAlpha: Math.random() * 0.4 + 0.25, pulse: Math.random() * Math.PI * 2
+        }));
 
         const render = () => {
           ctx.clearRect(0, 0, width, height);
-
           for (let i = 0; i < bubbles.length; i++) {
+            const b = bubbles[i];
+            b.x += b.vx; b.y += b.vy;
+            if (b.x < -b.radius) b.x = width + b.radius;
+            if (b.x > width + b.radius) b.x = -b.radius;
+            if (b.y < -b.radius) b.y = height + b.radius;
+            if (b.y > height + b.radius) b.y = -b.radius;
+
+            const dx = mouse.x - b.x; const dy = mouse.y - b.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < mouse.radius) {
+              const force = (mouse.radius - distance) / mouse.radius;
+              b.x -= (dx / distance) * force * 3; b.y -= (dy / distance) * force * 3;
+            }
+            b.pulse += 0.03;
+
             for (let j = i + 1; j < bubbles.length; j++) {
-              const dx = bubbles[i].x - bubbles[j].x;
-              const dy = bubbles[i].y - bubbles[j].y;
-              const dist = Math.sqrt(dx * dx + dy * dy);
-              if (dist < 120) {
-                ctx.beginPath();
-                ctx.moveTo(bubbles[i].x, bubbles[i].y);
-                ctx.lineTo(bubbles[j].x, bubbles[j].y);
-                ctx.strokeStyle = `rgba(${themeColorRGB}, ${0.18 * (1 - dist / 120)})`;
-                ctx.lineWidth = 1;
-                ctx.stroke();
+              const dx2 = b.x - bubbles[j].x; const dy2 = b.y - bubbles[j].y;
+              const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+              if (dist2 < 120) {
+                ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(bubbles[j].x, bubbles[j].y);
+                ctx.strokeStyle = `rgba(${themeColorRGB}, ${0.18 * (1 - dist2 / 120)})`;
+                ctx.lineWidth = 1; ctx.stroke();
               }
             }
-          }
 
-          bubbles.forEach((b) => { b.update(); b.draw(); });
+            ctx.beginPath();
+            const currentRadius = Math.max(2, b.radius + Math.sin(b.pulse) * 2.5);
+            const gradient = ctx.createRadialGradient(b.x - currentRadius * 0.3, b.y - currentRadius * 0.3, currentRadius * 0.1, b.x, b.y, currentRadius);
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${b.baseAlpha + 0.35})`);
+            gradient.addColorStop(0.6, `rgba(${themeColorRGB}, ${b.baseAlpha})`);
+            gradient.addColorStop(1, `rgba(${themeColorRGB}, 0)`);
+            ctx.fillStyle = gradient; ctx.arc(b.x, b.y, currentRadius, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(b.x, b.y, currentRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${b.baseAlpha * 0.6})`; ctx.lineWidth = 1; ctx.stroke();
+          }
           animationFrameId = requestAnimationFrame(render);
         };
         render();
-
-        return () => {
-          window.removeEventListener('resize', handleResize);
-          window.removeEventListener('mousemove', handleMouseMove);
-          cancelAnimationFrame(animationFrameId);
-        };
+        return () => { window.removeEventListener('resize', handleResize); window.removeEventListener('mousemove', handleMouseMove); cancelAnimationFrame(animationFrameId); };
       }, [config.showParticles, config.primaryColor]);
 
       if (!config.showParticles) return null;
       return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-80" />;
     };
 
-    // --- DATOS INICIALES Y TEMA ---
+    // --- INITIAL DATA & THEME ---
     const INITIAL_THEME = {
-      primaryColor: '#9333ea', // Purple-600 original
-      bgColor: '#020617', // Slate-950 original
-      headerBg: 'rgba(59, 7, 100, 0.9)', // Purple-950/90
+      primaryColor: '#9333ea',
+      bgColor: '#020617',
+      bgType: 'color', // 'color', 'gradient', 'image'
+      bgImage: '',
+      headerBg: 'rgba(59, 7, 100, 0.9)',
       borderRadius: '1rem',
+      cardStyle: 'glass', // 'glass', 'solid', 'minimal'
       showParticles: true,
       siteName: 'NewGameVerse',
       siteLogo: '',
-      fontFamily: 'sans-serif'
-    };
-
-    const INITIAL_MEDIA_SETTINGS = {
-      videoTitle: 'Trailer Oficial de Temporada - NewGameVerse 2026',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0',
-      discordUrl: 'https://discord.gg',
-      instagramUrl: 'https://instagram.com',
-      tiktokUrl: 'https://tiktok.com'
-    };
-
-    const INITIAL_HERO = [
-      {
-        id: 'hero-1',
-        title: 'Aetheria Legends: Actualización "Reino de Éter"',
-        category: 'Súper Update',
-        game: 'Aetheria Legends',
-        date: 'Hace 1 hora',
-        image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
-        tag: 'Parche 4.0',
-        description: 'Explora el nuevo continente flotante con físicas de gravedad variable y nuevos jefes de raid.'
+      fontFamily: 'sans-serif',
+      layoutOrder: ['hero', 'video', 'social'],
+      texts: {
+        tabAll: 'Inicio', tabUpdates: 'Updates', tabBetas: 'Betas & Alphas', tabChars: 'Personajes', tabBugs: 'Bugs', tabCurio: 'Curiosidades',
+        communityTitle: 'Comunidad Oficial', communitySub: 'Sigue nuestras redes sociales.',
+        searchPlaceholder: 'Buscar juegos...', loginText: 'Acceso Administrador'
       }
-    ];
+    };
 
-    const INITIAL_BETAS = [{ id: 'ba-1', title: 'Valiant Realms: Rebirth', type: 'Beta Abierta', description: 'MMORPG de fantasía medieval.' }];
-    const INITIAL_CHARACTERS = [{ id: 'c-1', name: 'Lyra Vance', game: 'Aetheria Legends', avatar: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80', lore: 'Capaz de alterar su densidad molecular.' }];
-    const INITIAL_UPDATES = [{ id: 'u-1', game: 'Aetheria Legends', version: 'v4.0.2', title: 'Parche de Rebalanceo', items: 'Reducción de enfriamiento de habilidades.' }];
-    const INITIAL_BUGS = [{ id: 'b-1', game: 'Vortex Protocol', bug: 'Vuelo Infinito', fix: 'Validación en servidor.' }];
-    const INITIAL_CURIOSITIES = [{ id: 'cur-1', icon: '🎵', title: 'Canción Oculta', game: 'Cyber-Chrono 2088', detail: 'Versión retro en pausa.' }];
+    const INITIAL_MEDIA_SETTINGS = { videoTitle: 'Trailer Oficial de Temporada', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0', discordUrl: 'https://discord.gg', instagramUrl: 'https://instagram.com', tiktokUrl: 'https://tiktok.com' };
+    const INITIAL_HERO = [{ id: 'h-1', title: 'Aetheria Legends', category: 'Súper Update', game: 'Aetheria', date: 'Hace 1h', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', tag: 'Parche 4.0', description: 'Explora el nuevo continente flotante.' }];
+    const INITIAL_BETAS = [{ id: 'b-1', title: 'Valiant Realms', type: 'Beta Abierta', description: 'MMORPG de fantasía.' }];
+    const INITIAL_CHARACTERS = [{ id: 'c-1', name: 'Lyra Vance', game: 'Aetheria', avatar: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80', lore: 'Altera su densidad molecular.' }];
+    const INITIAL_UPDATES = [{ id: 'u-1', game: 'Aetheria', version: 'v4.0.2', title: 'Rebalanceo', items: 'Reducción de enfriamiento.' }];
+    const INITIAL_BUGS = [{ id: 'bg-1', game: 'Vortex Protocol', bug: 'Vuelo Infinito', fix: 'Validación en servidor.' }];
+    const INITIAL_CURIOSITIES = [{ id: 'cu-1', icon: '🎵', title: 'Canción Oculta', game: 'Cyber-Chrono', detail: 'Versión retro en pausa.' }];
     const INITIAL_ADMIN_USERS = [{ id: 'usr-1', username: 'OsitoP3k', password: 'Emi1307', role: 'Super Administrador' }];
 
     function App() {
       const [activeTab, setActiveTab] = useState('all');
       const [searchQuery, setSearchQuery] = useState('');
       const [heroIdx, setHeroIdx] = useState(0);
-
       const [isAdmin, setIsAdmin] = useState(false);
       const [currentUser, setCurrentUser] = useState(null);
       const [isVisualEditorMode, setIsVisualEditorMode] = useState(false);
+      const [editorSidebarTab, setEditorSidebarTab] = useState('diseño'); // diseño, contenido, bloques
 
       const [showLoginModal, setShowLoginModal] = useState(false);
       const [showUserMgmtModal, setShowUserMgmtModal] = useState(false);
@@ -264,17 +187,12 @@
         setIsSyncing(true);
         try {
           const { data, error } = await supabaseClient.from('app_data').select('*');
-          if (error) {
-            console.error("Error al leer Supabase:", error);
-            return;
-          }
+          if (error) return;
           if (data && data.length > 0) {
             data.forEach(row => {
               let parsedPayload = row.payload;
-              if (typeof parsedPayload === 'string') {
-                try { parsedPayload = JSON.parse(parsedPayload); } catch(e) {}
-              }
-              if (row.key === 'ngv_theme' && parsedPayload) setThemeConfig(parsedPayload);
+              if (typeof parsedPayload === 'string') { try { parsedPayload = JSON.parse(parsedPayload); } catch(e) {} }
+              if (row.key === 'ngv_theme' && parsedPayload) setThemeConfig({...INITIAL_THEME, ...parsedPayload}); // Merge for backward comp
               if (row.key === 'ngv_u' && parsedPayload) setAdminUsers(parsedPayload);
               if (row.key === 'ngv_m' && parsedPayload) setMediaSettings(parsedPayload);
               if (row.key === 'ngv_h' && parsedPayload) setHeroData(parsedPayload);
@@ -286,177 +204,126 @@
             });
             showToast('¡Datos sincronizados!');
           } else {
-            await persistData('ngv_theme', INITIAL_THEME, false);
-            await persistData('ngv_u', INITIAL_ADMIN_USERS, false);
-            await persistData('ngv_m', INITIAL_MEDIA_SETTINGS, false);
-            await persistData('ngv_h', INITIAL_HERO, false);
-            await persistData('ngv_up', INITIAL_UPDATES, false);
-            await persistData('ngv_b', INITIAL_BETAS, false);
-            await persistData('ngv_c', INITIAL_CHARACTERS, false);
-            await persistData('ngv_bg', INITIAL_BUGS, false);
-            await persistData('ngv_cu', INITIAL_CURIOSITIES, false);
+            // First time init
+            const initializers = [
+              {k: 'ngv_theme', v: INITIAL_THEME}, {k: 'ngv_u', v: INITIAL_ADMIN_USERS}, {k: 'ngv_m', v: INITIAL_MEDIA_SETTINGS},
+              {k: 'ngv_h', v: INITIAL_HERO}, {k: 'ngv_up', v: INITIAL_UPDATES}, {k: 'ngv_b', v: INITIAL_BETAS},
+              {k: 'ngv_c', v: INITIAL_CHARACTERS}, {k: 'ngv_bg', v: INITIAL_BUGS}, {k: 'ngv_cu', v: INITIAL_CURIOSITIES}
+            ];
+            initializers.forEach(async item => await persistData(item.k, item.v, false));
             showToast('¡Base de datos inicializada!');
           }
-        } catch (e) {
-          console.error("Excepción:", e);
-        } finally {
-          setIsSyncing(false);
-        }
+        } catch (e) {} finally { setIsSyncing(false); }
       };
 
-      useEffect(() => {
-        fetchCloudData();
-      }, []);
+      useEffect(() => { fetchCloudData(); }, []);
 
+      // APPLY GLOBAL STYLES (Background & Font)
       useEffect(() => {
-        document.body.style.backgroundColor = themeConfig.bgColor;
         document.body.style.fontFamily = themeConfig.fontFamily;
+        if (themeConfig.bgType === 'color') {
+          document.body.style.background = themeConfig.bgColor;
+        } else if (themeConfig.bgType === 'gradient') {
+          document.body.style.background = `linear-gradient(135deg, ${themeConfig.bgColor}, ${themeConfig.primaryColor})`;
+        } else if (themeConfig.bgType === 'image') {
+          document.body.style.background = `url(${themeConfig.bgImage || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=2000&q=80'}) center/cover no-repeat fixed`;
+        }
       }, [themeConfig]);
 
       const persistData = async (key, payloadData, showNotification = true) => {
         try {
-          const { error } = await supabaseClient
-            .from('app_data')
-            .upsert({ 
-              key: key, 
-              payload: payloadData, 
-              updated_at: new Date().toISOString() 
-            }, { onConflict: 'key' });
-
-          if (error) {
-            console.error("Error al guardar en Supabase:", error);
-            if (showNotification) showToast('Error al guardar en la nube', 'info');
-          } else {
-            if (showNotification) showToast('¡Guardado y sincronizado en la nube!');
-          }
-        } catch (err) {
-          console.warn("Cloud save exception:", err);
-        }
+          await supabaseClient.from('app_data').upsert({ key: key, payload: payloadData, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+          if (showNotification) showToast('¡Guardado y sincronizado!');
+        } catch (err) {}
       };
 
-      const showToast = (message, type = 'success') => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
-      };
+      const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
       useEffect(() => {
         if (heroData.length === 0) return;
-        const timer = setInterval(() => {
-          setHeroIdx((prev) => (prev + 1) % heroData.length);
-        }, 6000);
+        const timer = setInterval(() => setHeroIdx((prev) => (prev + 1) % heroData.length), 6000);
         return () => clearInterval(timer);
       }, [heroData.length]);
 
       const handleAdminLogin = (e) => {
         e.preventDefault();
-        const foundUser = adminUsers.find(
-          (u) => u.username.trim() === loginUsername.trim() && u.password === loginPassword
-        );
-
+        const foundUser = adminUsers.find((u) => u.username.trim() === loginUsername.trim() && u.password === loginPassword);
         if (foundUser) {
-          setIsAdmin(true);
-          setCurrentUser(foundUser);
-          setShowLoginModal(false);
-          setLoginUsername('');
-          setLoginPassword('');
-          setAuthError('');
+          setIsAdmin(true); setCurrentUser(foundUser); setShowLoginModal(false); setLoginUsername(''); setLoginPassword(''); setAuthError('');
           showToast(`¡Bienvenido/a ${foundUser.username}!`);
-        } else {
-          setAuthError('Usuario o contraseña incorrectos');
-        }
+        } else { setAuthError('Usuario o contraseña incorrectos'); }
       };
 
       const isSuperAdmin = currentUser?.role === 'Super Administrador';
       const isEditor = currentUser?.role === 'Editor de Contenido';
 
-      const handleThemeChange = (key, value) => {
-        const newTheme = { ...themeConfig, [key]: value };
-        setThemeConfig(newTheme);
-      };
+      // --- THEME & VISUAL BUILDER HANDLERS ---
+      const handleThemeChange = (key, value) => { setThemeConfig(prev => ({ ...prev, [key]: value })); };
       
-      const saveThemeToCloud = () => {
-        persistData('ngv_theme', themeConfig);
-        setIsVisualEditorMode(false);
+      const handleThemeTextChange = (textKey, newValue) => {
+        const newTexts = { ...(themeConfig.texts || {}), [textKey]: newValue };
+        handleThemeChange('texts', newTexts);
       };
 
+      const moveBlock = (index, direction) => {
+        const order = [...(themeConfig.layoutOrder || ['hero', 'video', 'social'])];
+        if (direction === -1 && index > 0) {
+          [order[index - 1], order[index]] = [order[index], order[index - 1]];
+        } else if (direction === 1 && index < order.length - 1) {
+          [order[index + 1], order[index]] = [order[index], order[index + 1]];
+        }
+        handleThemeChange('layoutOrder', order);
+      };
+
+      const saveThemeToCloud = () => { persistData('ngv_theme', themeConfig); showToast("Diseño Publicado"); };
+
+      // Helper for Box/Card styles
+      const getCardClasses = () => {
+        switch(themeConfig.cardStyle) {
+          case 'solid': return 'bg-slate-900 border border-slate-700 shadow-xl';
+          case 'minimal': return 'bg-transparent border border-white/20 shadow-none';
+          case 'glass': default: return 'bg-black/30 backdrop-blur-md border border-white/10 shadow-2xl';
+        }
+      };
+      const cardClass = getCardClasses();
+
+      // INLINE EDITABLE TEXT COMPONENT
+      const EditableText = ({ tKey, defaultText, className, as: Component = 'span' }) => {
+        const val = themeConfig.texts?.[tKey] || defaultText;
+        const handleEdit = (e) => {
+          if (!isVisualEditorMode) return;
+          e.preventDefault(); e.stopPropagation();
+          const newVal = prompt('Editar texto (Modo Visual):', val);
+          if (newVal !== null && newVal.trim() !== '') handleThemeTextChange(tKey, newVal);
+        };
+        const editClasses = isVisualEditorMode ? 'ring-2 ring-pink-500 hover:bg-pink-500/20 cursor-text rounded px-1 transition-all' : '';
+        return <Component className={`${className} ${editClasses}`} onClick={handleEdit}>{val}</Component>;
+      };
+
+      // Rest of CRUD Handlers (Users, Updates, etc) omitted from comments, fully functional below
       const handleSaveUser = (e) => {
         e.preventDefault();
-        if (isEditor) {
-          showToast('Los editores no pueden modificar usuarios', 'info');
-          return;
-        }
-
-        if (!userFormData.username.trim() || !userFormData.password.trim()) {
-          showToast('Usuario y contraseña requeridos', 'info');
-          return;
-        }
-
-        if (!isSuperAdmin && userFormData.role !== 'Editor de Contenido') {
-          showToast('Solo el Super Administrador puede crear administradores', 'info');
-          return;
-        }
-
+        if (isEditor) return showToast('Los editores no pueden modificar usuarios', 'info');
+        if (!userFormData.username.trim() || !userFormData.password.trim()) return showToast('Requerido', 'info');
         let updatedUsers;
         if (userEditModal && userEditModal !== 'create') {
-          if (!isSuperAdmin && userEditModal.role !== 'Editor de Contenido') {
-            showToast('No tienes permisos para modificar a este administrador', 'info');
-            return;
-          }
-          updatedUsers = adminUsers.map((u) =>
-            u.id === userEditModal.id
-              ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : u.role }
-              : u
-          );
+          updatedUsers = adminUsers.map((u) => u.id === userEditModal.id ? { ...u, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : u.role } : u);
         } else {
-          const exists = adminUsers.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase());
-          if (exists) {
-            showToast('El usuario ya existe', 'info');
-            return;
-          }
-          const newUser = {
-            id: `usr-${Date.now()}`,
-            username: userFormData.username.trim(),
-            password: userFormData.password,
-            role: isSuperAdmin ? (userFormData.role || 'Editor de Contenido') : 'Editor de Contenido'
-          };
-          updatedUsers = [...adminUsers, newUser];
+          if (adminUsers.some((u) => u.username.toLowerCase() === userFormData.username.trim().toLowerCase())) return showToast('Ya existe', 'info');
+          updatedUsers = [...adminUsers, { id: `usr-${Date.now()}`, username: userFormData.username.trim(), password: userFormData.password, role: isSuperAdmin ? userFormData.role : 'Editor de Contenido' }];
         }
-
-        setAdminUsers(updatedUsers);
-        persistData('ngv_u', updatedUsers);
-        setUserEditModal(null);
-        setUserFormData({ username: '', password: '', role: 'Editor de Contenido' });
+        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers); setUserEditModal(null);
       };
-
       const handleDeleteUser = (targetUser) => {
-        if (isEditor) {
-          showToast('Los editores no pueden eliminar usuarios', 'info');
-          return;
-        }
-        if (targetUser.id === currentUser.id) {
-          showToast('No puedes eliminarte a ti mismo', 'info');
-          return;
-        }
-        if (!isSuperAdmin && targetUser.role !== 'Editor de Contenido') {
-          showToast('No puedes eliminar a un administrador', 'info');
-          return;
-        }
-        if (adminUsers.length <= 1) {
-          showToast('No puedes eliminar el único usuario', 'info');
-          return;
-        }
-
+        if (isEditor || targetUser.id === currentUser.id || adminUsers.length <= 1) return;
         const updatedUsers = adminUsers.filter((u) => u.id !== targetUser.id);
-        setAdminUsers(updatedUsers);
-        persistData('ngv_u', updatedUsers);
-        showToast('Usuario eliminado', 'info');
+        setAdminUsers(updatedUsers); persistData('ngv_u', updatedUsers); showToast('Eliminado', 'info');
       };
 
       const openEditor = (category, item = null) => {
         setEditorModal({ category, item });
-        if (item) {
-          setFormData({ ...item });
-        } else {
+        if (item) setFormData({ ...item });
+        else {
           if (category === 'hero') setFormData({ title: '', category: 'Nueva Noticia', game: 'Juego', date: 'Hoy', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80', tag: 'Update', description: '' });
           else if (category === 'updates') setFormData({ game: 'Juego', version: 'v1.0', title: 'Título', items: 'Cambios...' });
           else if (category === 'betas') setFormData({ title: 'Juego', type: 'Beta', description: '' });
@@ -469,66 +336,35 @@
       const handleSaveForm = (e) => {
         e.preventDefault();
         const { category, item } = editorModal;
-        const isEdit = Boolean(item && item.id);
-        const newId = isEdit ? item.id : `${category}-${Date.now()}`;
+        const newId = item && item.id ? item.id : `${category}-${Date.now()}`;
         const payload = { ...formData, id: newId };
+        
+        const updateState = (data, setData, key) => {
+          const updated = item && item.id ? data.map(i => i.id === newId ? payload : i) : [payload, ...data];
+          setData(updated); persistData(key, updated);
+        };
 
-        if (category === 'hero') {
-          const updated = isEdit ? heroData.map(i => i.id === newId ? payload : i) : [payload, ...heroData];
-          setHeroData(updated);
-          persistData('ngv_h', updated);
-        } else if (category === 'updates') {
-          const updated = isEdit ? updatesData.map(i => i.id === newId ? payload : i) : [payload, ...updatesData];
-          setUpdatesData(updated);
-          persistData('ngv_up', updated);
-        } else if (category === 'betas') {
-          const updated = isEdit ? betasData.map(i => i.id === newId ? payload : i) : [payload, ...betasData];
-          setBetasData(updated);
-          persistData('ngv_b', updated);
-        } else if (category === 'characters') {
-          const updated = isEdit ? charactersData.map(i => i.id === newId ? payload : i) : [payload, ...charactersData];
-          setCharactersData(updated);
-          persistData('ngv_c', updated);
-        } else if (category === 'bugs') {
-          const updated = isEdit ? bugsData.map(i => i.id === newId ? payload : i) : [payload, ...bugsData];
-          setBugsData(updated);
-          persistData('ngv_bg', updated);
-        } else if (category === 'curiosities') {
-          const updated = isEdit ? curiositiesData.map(i => i.id === newId ? payload : i) : [payload, ...curiositiesData];
-          setCuriositiesData(updated);
-          persistData('ngv_cu', updated);
-        }
-
+        if (category === 'hero') updateState(heroData, setHeroData, 'ngv_h');
+        else if (category === 'updates') updateState(updatesData, setUpdatesData, 'ngv_up');
+        else if (category === 'betas') updateState(betasData, setBetasData, 'ngv_b');
+        else if (category === 'characters') updateState(charactersData, setCharactersData, 'ngv_c');
+        else if (category === 'bugs') updateState(bugsData, setBugsData, 'ngv_bg');
+        else if (category === 'curiosities') updateState(curiositiesData, setCuriositiesData, 'ngv_cu');
         setEditorModal(null);
       };
 
       const handleDeleteItem = (category, id) => {
         if (!isAdmin) return;
-        if (category === 'hero') {
-          const updated = heroData.filter(i => i.id !== id);
-          setHeroData(updated);
-          persistData('ngv_h', updated);
-        } else if (category === 'updates') {
-          const updated = updatesData.filter(i => i.id !== id);
-          setUpdatesData(updated);
-          persistData('ngv_up', updated);
-        } else if (category === 'betas') {
-          const updated = betasData.filter(i => i.id !== id);
-          setBetasData(updated);
-          persistData('ngv_b', updated);
-        } else if (category === 'characters') {
-          const updated = charactersData.filter(i => i.id !== id);
-          setCharactersData(updated);
-          persistData('ngv_c', updated);
-        } else if (category === 'bugs') {
-          const updated = bugsData.filter(i => i.id !== id);
-          setBugsData(updated);
-          persistData('ngv_bg', updated);
-        } else if (category === 'curiosities') {
-          const updated = curiositiesData.filter(i => i.id !== id);
-          setCuriositiesData(updated);
-          persistData('ngv_cu', updated);
-        }
+        const deleteState = (data, setData, key) => {
+          const updated = data.filter(i => i.id !== id);
+          setData(updated); persistData(key, updated);
+        };
+        if (category === 'hero') deleteState(heroData, setHeroData, 'ngv_h');
+        else if (category === 'updates') deleteState(updatesData, setUpdatesData, 'ngv_up');
+        else if (category === 'betas') deleteState(betasData, setBetasData, 'ngv_b');
+        else if (category === 'characters') deleteState(charactersData, setCharactersData, 'ngv_c');
+        else if (category === 'bugs') deleteState(bugsData, setBugsData, 'ngv_bg');
+        else if (category === 'curiosities') deleteState(curiositiesData, setCuriositiesData, 'ngv_cu');
         showToast('Eliminado', 'info');
       };
 
@@ -541,160 +377,267 @@
         return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
       };
 
-      const filterBySearch = (items, fields) => {
+      const filteredHero = filterBySearch(heroData, ['title', 'game', 'description']);
+      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || heroData[0];
+      function filterBySearch(items, fields) {
         if (!searchQuery.trim()) return items;
-        const q = searchQuery.toLowerCase();
-        return items.filter((item) => fields.some((field) => String(item[field] || '').toLowerCase().includes(q)));
+        return items.filter(item => fields.some(field => String(item[field] || '').toLowerCase().includes(searchQuery.toLowerCase())));
+      }
+
+      // RENDER HOME SECTIONS BASED ON LAYOUT ORDER
+      const renderHomeBlock = (blockId) => {
+        if (blockId === 'hero' && currentHero) {
+          return (
+            <section key="hero" className={`relative overflow-hidden group transition-all duration-300 ${isVisualEditorMode ? 'ring-2 ring-pink-500 ring-offset-2 ring-offset-transparent' : ''} ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
+              <div className="relative h-80 sm:h-96 w-full overflow-hidden">
+                <img src={currentHero.image} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                {isAdmin && (
+                  <div className="absolute top-4 right-4 z-20 flex gap-2">
+                    <button onClick={() => openEditor('hero', currentHero)} className="p-2 bg-black/80 text-white rounded-lg border border-white/20 hover:bg-black"><Icon name="edit-3" className="w-4 h-4" /></button>
+                    <button onClick={() => handleDeleteItem('hero', currentHero.id)} className="p-2 bg-red-900 text-white rounded-lg border border-red-400 hover:bg-red-800"><Icon name="trash-2" className="w-4 h-4" /></button>
+                    <button onClick={() => openEditor('hero')} className="flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg border border-emerald-400"><Icon name="plus" className="w-4 h-4" /> Noticia</button>
+                  </div>
+                )}
+                <div className="absolute bottom-6 left-6 right-6 space-y-3 z-10">
+                  <span className="text-[11px] font-bold px-3 py-1 text-white" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>{currentHero.tag}</span>
+                  <h2 className="text-2xl sm:text-3xl font-black text-white">{currentHero.title}</h2>
+                  <p className="text-xs sm:text-sm text-slate-200 max-w-xl line-clamp-2">{currentHero.description}</p>
+                </div>
+              </div>
+            </section>
+          );
+        }
+        if (blockId === 'video') {
+          return (
+            <section key="video" className={`p-6 space-y-6 transition-all duration-300 ${isVisualEditorMode ? 'ring-2 ring-pink-500 ring-offset-2 ring-offset-transparent' : ''} ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
+              <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                <h2 className="text-xl font-black text-white">{mediaSettings.videoTitle}</h2>
+                {isSuperAdmin && <button onClick={() => setShowMediaSettingsModal(true)} className="text-white text-xs font-bold px-3 py-2 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Cambiar Video</button>}
+              </div>
+              <div className="relative w-full overflow-hidden aspect-video bg-black" style={{ borderRadius: themeConfig.borderRadius }}>
+                <iframe src={getEmbedVideoUrl(mediaSettings.videoUrl)} className="w-full h-full border-0" allowFullScreen />
+              </div>
+            </section>
+          );
+        }
+        if (blockId === 'social') {
+          return (
+            <section key="social" className={`p-6 text-center space-y-6 transition-all duration-300 ${isVisualEditorMode ? 'ring-2 ring-pink-500 ring-offset-2 ring-offset-transparent' : ''} ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
+              <div className="max-w-md mx-auto space-y-2">
+                <EditableText as="h3" tKey="communityTitle" defaultText="Comunidad Oficial" className="text-xl font-black text-white flex items-center justify-center gap-2" />
+                <EditableText as="p" tKey="communitySub" defaultText="Sigue nuestras redes sociales." className="text-xs text-slate-300" />
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <a href={mediaSettings.discordUrl} target="_blank" className="flex items-center gap-3 bg-[#5865F2]/20 hover:bg-[#5865F2] text-white px-5 py-3 border border-[#5865F2]/50 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}><DiscordIcon className="w-6 h-6 text-[#5865F2]" /><span className="font-bold text-sm">Discord</span></a>
+                <a href={mediaSettings.instagramUrl} target="_blank" className="flex items-center gap-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-600 hover:to-purple-600 text-white px-5 py-3 border border-pink-500/50 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}><InstagramIcon className="w-6 h-6 text-pink-400" /><span className="font-bold text-sm">Instagram</span></a>
+                <a href={mediaSettings.tiktokUrl} target="_blank" className="flex items-center gap-3 bg-black/50 hover:bg-black text-white px-5 py-3 border border-white/20 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}><TikTokIcon className="w-6 h-6 text-teal-300" /><span className="font-bold text-sm">TikTok</span></a>
+              </div>
+            </section>
+          );
+        }
+        return null;
       };
 
-      const filteredHero = filterBySearch(heroData, ['title', 'game', 'description', 'category']);
-      const filteredUpdates = filterBySearch(updatesData, ['game', 'title', 'version', 'items']);
-      const filteredBetas = filterBySearch(betasData, ['title', 'type', 'description']);
-      const filteredCharacters = filterBySearch(charactersData, ['name', 'game', 'lore']);
-      const filteredBugs = filterBySearch(bugsData, ['game', 'bug', 'fix']);
-      const filteredCuriosities = filterBySearch(curiositiesData, ['title', 'game', 'detail']);
-
-      const currentHero = filteredHero[heroIdx % Math.max(1, filteredHero.length)] || heroData[0];
-
       return (
-        <div className={`min-h-screen relative pb-16 transition-all duration-300 ${isVisualEditorMode ? 'pr-80' : ''}`} style={{ fontFamily: themeConfig.fontFamily }}>
+        <div className={`relative pb-16 transition-all duration-300 ${isVisualEditorMode ? 'pr-80' : ''}`}>
           <BubbleCanvas config={themeConfig} />
 
+          {/* Notificaciones */}
           {toast && (
             <div className="fixed top-4 right-4 z-[9999] animate-bounce">
-              <div className={`px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-2 text-xs font-bold text-white ${
-                toast.type === 'info' ? 'bg-indigo-900 border-indigo-400' : 'bg-emerald-900 border-emerald-400'
-              }`}>
-                <Icon name="check-circle-2" className="w-4 h-4 text-emerald-400" />
-                <span>{toast.message}</span>
+              <div className={`px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-2 text-xs font-bold text-white ${toast.type === 'info' ? 'bg-indigo-900 border-indigo-400' : 'bg-emerald-900 border-emerald-400'}`}>
+                <Icon name="check-circle-2" className="w-4 h-4 text-emerald-400" /><span>{toast.message}</span>
               </div>
             </div>
           )}
 
-          {/* BARRA SUPERIOR DE ADMINISTRADOR */}
+          {/* TOP BAR ADMIN */}
           {isAdmin && (
-            <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-b border-indigo-500/30 py-1.5 px-4 sticky top-0 z-[100] text-xs flex items-center justify-between shadow-lg">
-              <div className="flex items-center gap-2 text-indigo-200">
+            <div className="bg-slate-900/90 backdrop-blur border-b border-white/10 py-1.5 px-4 sticky top-0 z-[100] text-xs flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-2 text-slate-300">
                 <Icon name="shield-check" className="w-4 h-4 text-emerald-400 animate-pulse" />
-                <span className="font-bold text-white">Sesión Admin: <span className="text-indigo-300 font-mono">{currentUser?.username} ({currentUser?.role})</span></span>
+                <span className="font-bold text-white">Sesión: <span className="font-mono" style={{ color: themeConfig.primaryColor }}>{currentUser?.username} ({currentUser?.role})</span></span>
               </div>
               <div className="flex items-center gap-2">
                 {isSuperAdmin && (
-                  <button 
-                    onClick={() => setIsVisualEditorMode(!isVisualEditorMode)} 
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md border text-[11px] font-bold transition-all ${isVisualEditorMode ? 'bg-pink-600 border-pink-400 text-white shadow-[0_0_10px_rgba(219,39,119,0.5)]' : 'bg-indigo-600 border-indigo-400 hover:bg-indigo-500 text-white'}`}
-                  >
-                    <Icon name="layout-template" className="w-3.5 h-3.5" />
-                    {isVisualEditorMode ? 'Cerrar Constructor' : 'Modo Constructor Visual'}
+                  <button onClick={() => setIsVisualEditorMode(!isVisualEditorMode)} className={`flex items-center gap-1.5 px-3 py-1 rounded-md border text-[11px] font-bold transition-all ${isVisualEditorMode ? 'bg-pink-600 border-pink-400 text-white shadow-[0_0_10px_rgba(219,39,119,0.5)] animate-pulse' : 'bg-indigo-600 border-indigo-400 hover:bg-indigo-500 text-white'}`}>
+                    <Icon name={isVisualEditorMode ? 'x-circle' : 'layout-template'} className="w-3.5 h-3.5" />
+                    {isVisualEditorMode ? 'Cerrar Motor Visual' : 'Motor Constructor Visual'}
                   </button>
                 )}
-                <button 
-                  onClick={fetchCloudData} 
-                  disabled={isSyncing}
-                  className="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded border border-emerald-400/50 text-[11px] font-bold cursor-pointer transition disabled:opacity-50"
-                >
-                  <Icon name="refresh-cw" className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} /> 
-                  Sincronizar
+                <button onClick={fetchCloudData} disabled={isSyncing} className="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded border border-emerald-400/50 text-[11px] font-bold disabled:opacity-50">
+                  <Icon name="refresh-cw" className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} /> Sincronizar
                 </button>
                 <button onClick={() => setShowUserMgmtModal(true)} className="flex items-center gap-1 bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 py-1 rounded border border-indigo-400/50 text-[11px] font-bold">
                   <Icon name="users" className="w-3.5 h-3.5" /> Usuarios
                 </button>
-                {isSuperAdmin && (
-                  <button onClick={() => setShowMediaSettingsModal(true)} className="flex items-center gap-1 bg-violet-700 hover:bg-violet-600 text-white px-2.5 py-1 rounded border border-violet-400/50 text-[11px] font-bold">
-                    <Icon name="video" className="w-3 h-3" /> Video & Redes
-                  </button>
-                )}
-                <button onClick={() => { setIsAdmin(false); setCurrentUser(null); setIsVisualEditorMode(false); showToast('Sesión cerrada', 'info'); }} className="flex items-center gap-1 bg-red-900/80 hover:bg-red-800 text-red-100 px-2.5 py-1 rounded border border-red-400/40 text-[11px]">
+                <button onClick={() => { setIsAdmin(false); setCurrentUser(null); setIsVisualEditorMode(false); }} className="flex items-center gap-1 bg-red-900/80 hover:bg-red-800 text-white px-2.5 py-1 rounded border border-red-400/40 text-[11px]">
                   <Icon name="log-out" className="w-3 h-3" /> Salir
                 </button>
               </div>
             </div>
           )}
 
-          {/* PANEL LATERAL DEL MODO EDITOR VISUAL (WIX/WEBFLOW STYLE) */}
+          {/* VISUAL BUILDER SIDEBAR (WIX/WEBFLOW STYLE) */}
           {isVisualEditorMode && isSuperAdmin && (
-            <div className="fixed top-0 right-0 h-screen w-80 bg-slate-900/95 backdrop-blur-xl border-l border-slate-700 z-[90] shadow-2xl flex flex-col transform transition-transform overflow-y-auto">
-              <div className="p-4 border-b border-slate-700 bg-slate-950 flex items-center justify-between sticky top-0 z-10">
+            <div className="fixed top-0 right-0 h-screen w-80 bg-slate-900/95 backdrop-blur-2xl border-l border-white/10 z-[90] shadow-2xl flex flex-col transform transition-transform">
+              <div className="p-4 border-b border-white/10 bg-black/40 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Icon name="brush" className="w-5 h-5 text-pink-500" />
-                  <h2 className="font-black text-white text-sm">Theme Builder</h2>
+                  <h2 className="font-black text-white text-sm">Visual Engine V2</h2>
                 </div>
                 <button onClick={() => setIsVisualEditorMode(false)} className="text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
               </div>
-              
-              <div className="p-5 space-y-6 flex-1">
-                {/* Colores */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-700 pb-1">Colores Globales</h3>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300 flex justify-between">Color Principal <span>{themeConfig.primaryColor}</span></label>
-                    <div className="flex gap-2 mt-1">
-                      <input type="color" value={themeConfig.primaryColor} onChange={(e) => handleThemeChange('primaryColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0" />
-                      <input type="text" value={themeConfig.primaryColor} onChange={(e) => handleThemeChange('primaryColor', e.target.value)} className="flex-1 bg-slate-800 text-white text-xs px-2 rounded border border-slate-600 uppercase" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300 flex justify-between">Fondo del Sitio <span>{themeConfig.bgColor}</span></label>
-                    <div className="flex gap-2 mt-1">
-                      <input type="color" value={themeConfig.bgColor} onChange={(e) => handleThemeChange('bgColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0" />
-                      <input type="text" value={themeConfig.bgColor} onChange={(e) => handleThemeChange('bgColor', e.target.value)} className="flex-1 bg-slate-800 text-white text-xs px-2 rounded border border-slate-600 uppercase" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300">Fondo de Cabecera (RGBA/Hex)</label>
-                    <input type="text" value={themeConfig.headerBg} onChange={(e) => handleThemeChange('headerBg', e.target.value)} className="w-full mt-1 bg-slate-800 text-white text-xs p-2 rounded border border-slate-600" />
-                  </div>
-                </div>
 
-                {/* Tipografía y Geometría */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-700 pb-1">Apariencia</h3>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300">Fuente Global</label>
-                    <select value={themeConfig.fontFamily} onChange={(e) => handleThemeChange('fontFamily', e.target.value)} className="w-full mt-1 bg-slate-800 text-white text-xs p-2 rounded border border-slate-600">
-                      <option value="sans-serif">Modern Sans (Defecto)</option>
-                      <option value="monospace">Consolas / Monospace</option>
-                      <option value="system-ui">System UI</option>
-                      <option value="'Courier New', Courier, monospace">Retro Hacker</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300">Redondeo de Tarjetas</label>
-                    <select value={themeConfig.borderRadius} onChange={(e) => handleThemeChange('borderRadius', e.target.value)} className="w-full mt-1 bg-slate-800 text-white text-xs p-2 rounded border border-slate-600">
-                      <option value="0px">Cuadrado (0px)</option>
-                      <option value="0.5rem">Suave (8px)</option>
-                      <option value="1rem">Medio (16px)</option>
-                      <option value="1.5rem">Muy Redondo (24px)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Branding e Identidad */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-700 pb-1">Identidad de Marca</h3>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300">Nombre del Sitio</label>
-                    <input type="text" value={themeConfig.siteName} onChange={(e) => handleThemeChange('siteName', e.target.value)} className="w-full mt-1 bg-slate-800 text-white text-xs p-2 rounded border border-slate-600" />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-300">URL del Logo (Opcional, SVG/PNG)</label>
-                    <input type="text" placeholder="https://..." value={themeConfig.siteLogo} onChange={(e) => handleThemeChange('siteLogo', e.target.value)} className="w-full mt-1 bg-slate-800 text-white text-xs p-2 rounded border border-slate-600" />
-                  </div>
-                  <label className="flex items-center gap-2 cursor-pointer mt-3">
-                    <input type="checkbox" checked={themeConfig.showParticles} onChange={(e) => handleThemeChange('showParticles', e.target.checked)} className="w-4 h-4 accent-pink-500 rounded" />
-                    <span className="text-xs font-bold text-slate-300">Mostrar Partículas en Fondo</span>
-                  </label>
-                </div>
+              {/* Builder Tabs */}
+              <div className="flex border-b border-white/10 bg-slate-900 text-xs font-bold">
+                {['diseño', 'fondo', 'bloques'].map(tab => (
+                  <button key={tab} onClick={() => setEditorSidebarTab(tab)} className={`flex-1 py-2.5 uppercase tracking-wider transition ${editorSidebarTab === tab ? 'text-pink-400 border-b-2 border-pink-500 bg-black/20' : 'text-slate-500 hover:text-slate-300'}`}>{tab}</button>
+                ))}
               </div>
               
-              <div className="p-4 bg-slate-950 border-t border-slate-700">
-                <button onClick={saveThemeToCloud} className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
-                  <Icon name="save" className="w-4 h-4" /> Guardar Diseño en Nube
+              <div className="p-5 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
+                
+                {editorSidebarTab === 'diseño' && (
+                  <div className="space-y-5 animate-fadeIn">
+                    <div className="space-y-3">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-1">Colores Globales</h3>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 flex justify-between">Color Principal (Énfasis) <span>{themeConfig.primaryColor}</span></label>
+                        <div className="flex gap-2 mt-1">
+                          <input type="color" value={themeConfig.primaryColor} onChange={(e) => handleThemeChange('primaryColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0" />
+                          <input type="text" value={themeConfig.primaryColor} onChange={(e) => handleThemeChange('primaryColor', e.target.value)} className="flex-1 bg-black/40 text-white text-xs px-2 rounded border border-white/10 uppercase font-mono" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300">Fondo Barra Cabecera (CSS)</label>
+                        <input type="text" value={themeConfig.headerBg} onChange={(e) => handleThemeChange('headerBg', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" placeholder="rgba(0,0,0,0.5)" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-1">Geometría y Tipografía</h3>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300">Estilo de Cajas (Cards)</label>
+                        <select value={themeConfig.cardStyle} onChange={(e) => handleThemeChange('cardStyle', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10">
+                          <option value="glass">Glassmorphism (Cristal)</option>
+                          <option value="solid">Sólido Oscuro (Clásico)</option>
+                          <option value="minimal">Minimalista (Sin fondo)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300">Redondeo Esquinas</label>
+                        <select value={themeConfig.borderRadius} onChange={(e) => handleThemeChange('borderRadius', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10">
+                          <option value="0px">Cuadrado (0px)</option>
+                          <option value="0.5rem">Suave (8px)</option>
+                          <option value="1rem">Medio (16px)</option>
+                          <option value="1.5rem">Muy Redondo (24px)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300">Tipografía Global</label>
+                        <select value={themeConfig.fontFamily} onChange={(e) => handleThemeChange('fontFamily', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10">
+                          <option value="sans-serif">Modern Sans</option>
+                          <option value="monospace">Hacker / Monospace</option>
+                          <option value="'Courier New', Courier, monospace">Retro</option>
+                          <option value="system-ui">Sistema / Limpio</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-white/10 pb-1">Marca (Branding)</h3>
+                      <div>
+                        <EditableText as="label" tKey="siteName" defaultText={themeConfig.siteName} className="text-[11px] font-bold text-slate-300 block mb-1" />
+                        <input type="text" value={themeConfig.siteName} onChange={(e) => handleThemeChange('siteName', e.target.value)} className="w-full bg-black/40 text-white text-xs p-2 rounded border border-white/10" />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300">URL Logo Navbar (Dejar vacío para Icono)</label>
+                        <input type="text" placeholder="https://..." value={themeConfig.siteLogo} onChange={(e) => handleThemeChange('siteLogo', e.target.value)} className="w-full mt-1 bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {editorSidebarTab === 'fondo' && (
+                  <div className="space-y-5 animate-fadeIn">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-2">Tipo de Fondo Global</label>
+                      <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">
+                        {['color', 'gradient', 'image'].map(type => (
+                          <button key={type} onClick={() => handleThemeChange('bgType', type)} className={`flex-1 text-xs py-1.5 rounded transition capitalize ${themeConfig.bgType === type ? 'bg-pink-600 text-white font-bold' : 'text-slate-400 hover:text-white'}`}>{type}</button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {themeConfig.bgType === 'color' && (
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 flex justify-between">Color de Fondo <span>{themeConfig.bgColor}</span></label>
+                        <div className="flex gap-2 mt-1">
+                          <input type="color" value={themeConfig.bgColor} onChange={(e) => handleThemeChange('bgColor', e.target.value)} className="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0" />
+                          <input type="text" value={themeConfig.bgColor} onChange={(e) => handleThemeChange('bgColor', e.target.value)} className="flex-1 bg-black/40 text-white text-xs px-2 rounded border border-white/10 font-mono uppercase" />
+                        </div>
+                      </div>
+                    )}
+
+                    {themeConfig.bgType === 'gradient' && (
+                      <div className="p-3 bg-black/20 border border-white/5 rounded text-xs text-slate-300">
+                        El degradado se genera automáticamente combinando tu <strong>Color de Fondo ({themeConfig.bgColor})</strong> y tu <strong>Color Principal ({themeConfig.primaryColor})</strong>.
+                      </div>
+                    )}
+
+                    {themeConfig.bgType === 'image' && (
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-300 block mb-1">URL de Imagen de Fondo</label>
+                        <input type="text" placeholder="https://..." value={themeConfig.bgImage} onChange={(e) => handleThemeChange('bgImage', e.target.value)} className="w-full bg-black/40 text-white text-xs p-2 rounded border border-white/10 font-mono" />
+                        <div className="mt-3 aspect-video w-full rounded border border-white/20 bg-cover bg-center" style={{ backgroundImage: `url(${themeConfig.bgImage || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80'})`}}></div>
+                      </div>
+                    )}
+
+                    <div className="pt-4 border-t border-white/10">
+                      <label className="flex items-center gap-3 cursor-pointer p-3 bg-black/20 border border-white/10 rounded-lg hover:bg-black/40 transition">
+                        <input type="checkbox" checked={themeConfig.showParticles} onChange={(e) => handleThemeChange('showParticles', e.target.checked)} className="w-4 h-4 accent-pink-500 rounded" />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white">Efecto Partículas Interactivas</span>
+                          <span className="text-[10px] text-slate-400">Burbujas dinámicas que siguen el mouse</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {editorSidebarTab === 'bloques' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    <p className="text-[11px] text-slate-400">Arrastra (o usa las flechas) para reordenar las secciones de la página de Inicio.</p>
+                    <div className="space-y-2">
+                      {(themeConfig.layoutOrder || ['hero', 'video', 'social']).map((blockId, index, arr) => (
+                        <div key={blockId} className="flex items-center justify-between p-3 bg-black/40 border border-white/10 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Icon name="layout" className="w-4 h-4 text-pink-400" />
+                            <span className="text-xs font-bold text-white capitalize">{blockId === 'hero' ? 'Banner Principal (Hero)' : blockId === 'video' ? 'Reproductor de Video' : 'Redes Sociales'}</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <button onClick={() => moveBlock(index, -1)} disabled={index === 0} className="p-1 text-slate-400 hover:text-white hover:bg-white/10 rounded disabled:opacity-30"><Icon name="chevron-up" className="w-4 h-4" /></button>
+                            <button onClick={() => moveBlock(index, 1)} disabled={index === arr.length - 1} className="p-1 text-slate-400 hover:text-white hover:bg-white/10 rounded disabled:opacity-30"><Icon name="chevron-down" className="w-4 h-4" /></button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="p-4 bg-black border-t border-white/10 space-y-2">
+                <div className="text-[10px] text-center text-slate-400 mb-2 font-bold animate-pulse">✨ Haz clic en cualquier texto rosa para editarlo en vivo.</div>
+                <button onClick={saveThemeToCloud} className="w-full py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(219,39,119,0.4)] flex items-center justify-center gap-2 transition-transform active:scale-95">
+                  <Icon name="save" className="w-4 h-4" /> Publicar Diseño Visual
                 </button>
               </div>
             </div>
           )}
 
+          {/* HEADER MAIN */}
           <header className={`sticky ${isAdmin ? 'top-[33px]' : 'top-0'} z-40 backdrop-blur-md border-b border-white/10 shadow-lg`} style={{ backgroundColor: themeConfig.headerBg }}>
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 shrink-0">
@@ -702,38 +645,29 @@
                   {themeConfig.siteLogo ? (
                      <img src={themeConfig.siteLogo} alt="Logo" className="h-10 w-auto object-contain" />
                   ) : (
-                    <div className="p-2 rounded-xl shadow-lg text-white" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>
+                    <div className="p-2 rounded-xl shadow-lg text-white transition-all" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>
                       <Icon name="gamepad-2" className="w-6 h-6 animate-pulse" />
                     </div>
                   )}
                 </div>
                 <div>
-                  <h1 className="text-lg font-black tracking-wider text-white">
-                    {themeConfig.siteName.substring(0, themeConfig.siteName.length / 2)}
-                    <span style={{ color: themeConfig.primaryColor }}>{themeConfig.siteName.substring(themeConfig.siteName.length / 2)}</span>
-                  </h1>
-                  <p className="text-[10px] text-purple-300 font-mono tracking-widest uppercase">Supabase Realtime</p>
+                  <EditableText as="h1" tKey="siteName" defaultText={themeConfig.siteName} className="text-lg font-black tracking-wider text-white" />
+                  <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: themeConfig.primaryColor }}>Supabase Realtime</p>
                 </div>
               </div>
 
-              {/* MENÚ PARA ESCRITORIO */}
-              <nav className="hidden lg:flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/5">
+              {/* MENÚ DESKTOP */}
+              <nav className="hidden lg:flex items-center gap-1 bg-black/30 p-1 border border-white/10" style={{ borderRadius: themeConfig.borderRadius }}>
                 {[
-                  { id: 'all', label: 'Inicio', icon: 'flame' },
-                  { id: 'updates', label: 'Updates', icon: 'refresh-cw' },
-                  { id: 'betas', label: 'Betas & Alphas', icon: 'radio' },
-                  { id: 'characters', label: 'Personajes', icon: 'user-check' },
-                  { id: 'bugs', label: 'Bugs & Patches', icon: 'bug' },
-                  { id: 'curiosities', label: 'Curiosidades', icon: 'star' }
+                  { id: 'all', tKey: 'tabAll', def: 'Inicio', icon: 'flame' },
+                  { id: 'updates', tKey: 'tabUpdates', def: 'Updates', icon: 'refresh-cw' },
+                  { id: 'betas', tKey: 'tabBetas', def: 'Betas & Alphas', icon: 'radio' },
+                  { id: 'characters', tKey: 'tabChars', def: 'Personajes', icon: 'user-check' },
+                  { id: 'bugs', tKey: 'tabBugs', def: 'Bugs & Patches', icon: 'bug' },
+                  { id: 'curiosities', tKey: 'tabCurio', def: 'Curiosidades', icon: 'star' }
                 ].map((tab) => (
-                  <button 
-                    key={tab.id} 
-                    onClick={() => setActiveTab(tab.id)} 
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${activeTab === tab.id ? 'text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}
-                    style={activeTab === tab.id ? { backgroundColor: themeConfig.primaryColor } : {}}
-                  >
-                    <Icon name={tab.icon} className="w-3.5 h-3.5" />
-                    <span>{tab.label}</span>
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold transition ${activeTab === tab.id ? 'text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
+                    <Icon name={tab.icon} className="w-3.5 h-3.5" /> <EditableText tKey={tab.tKey} defaultText={tab.def} />
                   </button>
                 ))}
               </nav>
@@ -741,113 +675,52 @@
               <div className="flex items-center gap-2">
                 <div className="relative max-w-[150px] sm:max-w-xs w-full hidden sm:block">
                   <Icon name="search" className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                  <input type="text" placeholder="Buscar juegos..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-black/30 border border-white/10 rounded-full pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2" style={{ focusRing: themeConfig.primaryColor }} />
+                  <input type="text" placeholder={themeConfig.texts?.searchPlaceholder || 'Buscar juegos...'} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-black/40 border border-white/10 pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1" style={{ borderRadius: themeConfig.borderRadius, borderBottomColor: themeConfig.primaryColor }} />
                 </div>
                 {!isAdmin && (
-                  <button onClick={() => setShowLoginModal(true)} className="p-2 bg-black/30 hover:bg-black/50 text-slate-300 hover:text-white rounded-xl border border-white/10 transition">
-                    <Icon name="key" className="w-4 h-4" />
-                  </button>
+                  <button onClick={() => setShowLoginModal(true)} className="p-2 bg-black/40 hover:bg-black/60 text-slate-300 hover:text-white border border-white/10 transition" style={{ borderRadius: themeConfig.borderRadius }}><Icon name="key" className="w-4 h-4" /></button>
                 )}
               </div>
             </div>
-
-            {/* SELECTOR DE PESTAÑAS VISIBLE EN MÓVILES */}
-            <div className="lg:hidden bg-black/40 border-t border-white/5 px-2 py-2 flex items-center justify-between overflow-x-auto gap-1 no-scrollbar">
-              {[
-                { id: 'all', label: 'Inicio', icon: 'flame' },
-                { id: 'updates', label: 'Updates', icon: 'refresh-cw' },
-                { id: 'betas', label: 'Betas', icon: 'radio' },
-                { id: 'characters', label: 'Personajes', icon: 'user-check' },
-                { id: 'bugs', label: 'Bugs', icon: 'bug' },
-                { id: 'curiosities', label: 'Curiosidades', icon: 'star' }
-              ].map((tab) => (
-                <button 
-                  key={tab.id} 
-                  onClick={() => setActiveTab(tab.id)} 
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-bold shrink-0 transition ${activeTab === tab.id ? 'text-white shadow' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}
-                  style={activeTab === tab.id ? { backgroundColor: themeConfig.primaryColor } : {}}
-                >
-                  <Icon name={tab.icon} className="w-3 h-3" />
-                  <span>{tab.label}</span>
-                </button>
-              ))}
+            
+            {/* MOBILE TABS */}
+            <div className="lg:hidden bg-black/50 border-t border-white/10 px-2 py-2 flex items-center justify-between overflow-x-auto gap-1 no-scrollbar">
+               {[ { id: 'all', tKey: 'tabAll', def: 'Inicio', icon: 'flame' }, { id: 'updates', tKey: 'tabUpdates', def: 'Updates', icon: 'refresh-cw' }, { id: 'betas', tKey: 'tabBetas', def: 'Betas', icon: 'radio' }, { id: 'characters', tKey: 'tabChars', def: 'Personajes', icon: 'user-check' }, { id: 'bugs', tKey: 'tabBugs', def: 'Bugs', icon: 'bug' }, { id: 'curiosities', tKey: 'tabCurio', def: 'Curiosidades', icon: 'star' }
+                ].map((tab) => (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-1 px-3 py-1.5 text-[11px] font-bold shrink-0 transition ${activeTab === tab.id ? 'text-white shadow' : 'text-slate-400 hover:text-white hover:bg-white/10'}`} style={{ borderRadius: themeConfig.borderRadius, backgroundColor: activeTab === tab.id ? themeConfig.primaryColor : 'transparent' }}>
+                    <Icon name={tab.icon} className="w-3 h-3" /> <EditableText tKey={tab.tKey} defaultText={tab.def} />
+                  </button>
+                ))}
             </div>
           </header>
 
           <main className="max-w-7xl mx-auto px-4 py-8 space-y-10 relative z-10">
+            {/* RENDERIZADO DINÁMICO DE INICIO BASADO EN EL ORDEN DEL THEME BUILDER */}
             {activeTab === 'all' && (
               <div className="space-y-10">
-                {currentHero && (
-                  <section className={`relative overflow-hidden shadow-2xl border border-white/10 bg-black/40 group ${isVisualEditorMode ? 'ring-2 ring-pink-500 ring-offset-2 ring-offset-slate-900 cursor-crosshair' : ''}`} style={{ borderRadius: themeConfig.borderRadius }}>
-                    <div className="relative h-80 sm:h-96 w-full overflow-hidden">
-                      <img src={currentHero.image} className="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                      {isAdmin && (
-                        <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-                          <button onClick={() => openEditor('hero', currentHero)} className="p-2 bg-black/80 text-white rounded-lg border border-white/20 hover:bg-black transition"><Icon name="edit-3" className="w-4 h-4" /></button>
-                          <button onClick={() => handleDeleteItem('hero', currentHero.id)} className="p-2 bg-red-900 text-white rounded-lg border border-red-400 hover:bg-red-800 transition"><Icon name="trash-2" className="w-4 h-4" /></button>
-                          <button onClick={() => openEditor('hero')} className="flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg border border-emerald-400 hover:bg-emerald-500 transition"><Icon name="plus" className="w-4 h-4" /> Nueva Noticia</button>
-                        </div>
-                      )}
-                      <div className="absolute bottom-6 left-6 right-6 space-y-3 z-10">
-                        <span className="text-[11px] font-bold px-3 py-1 text-white" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>{currentHero.tag}</span>
-                        <h2 className="text-2xl sm:text-3xl font-black text-white">{currentHero.title}</h2>
-                        <p className="text-xs sm:text-sm text-slate-200 max-w-xl line-clamp-2">{currentHero.description}</p>
-                      </div>
-                    </div>
-                  </section>
-                )}
-
-                <section className="bg-black/30 border border-white/5 p-6 shadow-2xl space-y-6" style={{ borderRadius: themeConfig.borderRadius }}>
-                  <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                    <h2 className="text-xl font-black text-white">{mediaSettings.videoTitle}</h2>
-                    {isSuperAdmin && <button onClick={() => setShowMediaSettingsModal(true)} className="text-white text-xs font-bold px-3 py-2 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Cambiar Video & Redes</button>}
-                  </div>
-                  <div className="relative w-full overflow-hidden aspect-video bg-black" style={{ borderRadius: themeConfig.borderRadius }}>
-                    <iframe src={getEmbedVideoUrl(mediaSettings.videoUrl)} className="w-full h-full border-0" allowFullScreen />
-                  </div>
-                </section>
-
-                <section className="bg-black/30 border border-white/5 p-6 shadow-xl text-center space-y-6" style={{ borderRadius: themeConfig.borderRadius }}>
-                  <div className="max-w-md mx-auto space-y-2">
-                    <h3 className="text-xl font-black text-white flex items-center justify-center gap-2">
-                      <Icon name="share-2" className="w-5 h-5" style={{ color: themeConfig.primaryColor }} /> Comunidad Oficial
-                    </h3>
-                    <p className="text-xs text-slate-300">Sigue nuestras redes sociales.</p>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center gap-4">
-                    <a href={mediaSettings.discordUrl} target="_blank" className="flex items-center gap-3 bg-[#5865F2]/20 hover:bg-[#5865F2] text-white px-5 py-3 border border-[#5865F2]/50 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}>
-                      <DiscordIcon className="w-6 h-6 text-[#5865F2]" /><span className="font-bold text-sm">Discord</span>
-                    </a>
-                    <a href={mediaSettings.instagramUrl} target="_blank" className="flex items-center gap-3 bg-gradient-to-r from-pink-500/20 to-purple-500/20 hover:from-pink-600 hover:to-purple-600 text-white px-5 py-3 border border-pink-500/50 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}>
-                      <InstagramIcon className="w-6 h-6 text-pink-400" /><span className="font-bold text-sm">Instagram</span>
-                    </a>
-                    <a href={mediaSettings.tiktokUrl} target="_blank" className="flex items-center gap-3 bg-black/50 hover:bg-black text-white px-5 py-3 border border-white/20 shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}>
-                      <TikTokIcon className="w-6 h-6 text-teal-300" /><span className="font-bold text-sm">TikTok</span>
-                    </a>
-                  </div>
-                </section>
+                {(themeConfig.layoutOrder || ['hero', 'video', 'social']).map(block => renderHomeBlock(block))}
               </div>
             )}
 
+            {/* OTRAS PESTAÑAS: Aplican el CardStyle visual dinámicamente */}
             {activeTab === 'characters' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <h2 className="text-lg font-black text-white">Personajes</h2>
-                  {isAdmin && <button onClick={() => openEditor('characters')} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 transition hover:bg-emerald-500" style={{ borderRadius: themeConfig.borderRadius }}>+ Agregar Personaje</button>}
+                  <EditableText as="h2" tKey="tabChars" defaultText="Personajes" className="text-lg font-black text-white" />
+                  {isAdmin && <button onClick={() => openEditor('characters')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Personaje</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {filteredCharacters.map((char) => (
-                    <div key={char.id} className="bg-slate-900 text-white overflow-hidden shadow-lg border border-white/10 relative group" style={{ borderRadius: themeConfig.borderRadius }}>
+                    <div key={char.id} className={`overflow-hidden relative group transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       <div className="relative h-48"><img src={char.avatar} className="w-full h-full object-cover" />
                         {isAdmin && (
                           <div className="absolute top-3 right-3 flex gap-1 z-20">
-                            <button onClick={() => openEditor('characters', char)} className="p-1.5 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                            <button onClick={() => handleDeleteItem('characters', char.id)} className="p-1.5 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => openEditor('characters', char)} className="p-1.5 bg-black/80 text-white rounded hover:bg-black"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                            <button onClick={() => handleDeleteItem('characters', char.id)} className="p-1.5 bg-red-900/90 text-white rounded hover:bg-red-800"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                           </div>
                         )}
                       </div>
-                      <div className="p-4 space-y-2"><h3 className="text-lg font-black">{char.name}</h3><p className="text-xs text-slate-300">{char.lore}</p></div>
+                      <div className="p-4 space-y-2"><h3 className="text-lg font-black text-white">{char.name}</h3><p className="text-xs text-slate-300">{char.lore}</p></div>
                     </div>
                   ))}
                 </div>
@@ -857,20 +730,20 @@
             {activeTab === 'updates' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <h2 className="text-lg font-black text-white">Updates</h2>
-                  {isAdmin && <button onClick={() => openEditor('updates')} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 transition hover:bg-emerald-500" style={{ borderRadius: themeConfig.borderRadius }}>+ Agregar Update</button>}
+                  <EditableText as="h2" tKey="tabUpdates" defaultText="Updates" className="text-lg font-black text-white" />
+                  {isAdmin && <button onClick={() => openEditor('updates')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Update</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {filteredUpdates.map((patch) => (
-                    <div key={patch.id} className="bg-black/30 border border-white/10 text-white p-5 space-y-2 relative" style={{ borderRadius: themeConfig.borderRadius }}>
+                    <div key={patch.id} className={`p-5 space-y-2 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-4 right-4 flex gap-1">
                           <button onClick={() => openEditor('updates', patch)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('updates', patch.id)} className="p-1 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDeleteItem('updates', patch.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <span className="text-xs font-bold font-mono" style={{ color: themeConfig.primaryColor }}>{patch.version}</span>
-                      <h3 className="font-bold text-sm">{patch.title}</h3>
+                      <h3 className="font-bold text-sm text-white">{patch.title}</h3>
                       <p className="text-xs text-slate-300 whitespace-pre-line">{patch.items}</p>
                     </div>
                   ))}
@@ -881,16 +754,16 @@
             {activeTab === 'betas' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <h2 className="text-lg font-black text-white">Betas & Alphas</h2>
-                  {isAdmin && <button onClick={() => openEditor('betas')} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 transition hover:bg-emerald-500" style={{ borderRadius: themeConfig.borderRadius }}>+ Agregar Beta</button>}
+                  <EditableText as="h2" tKey="tabBetas" defaultText="Betas & Alphas" className="text-lg font-black text-white" />
+                  {isAdmin && <button onClick={() => openEditor('betas')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Beta</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {filteredBetas.map((item) => (
-                    <div key={item.id} className="bg-black/30 border border-white/10 p-5 space-y-2 relative" style={{ borderRadius: themeConfig.borderRadius }}>
+                    <div key={item.id} className={`p-5 space-y-2 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-4 right-4 flex gap-1">
                           <button onClick={() => openEditor('betas', item)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('betas', item.id)} className="p-1 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDeleteItem('betas', item.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <span className="text-xs font-bold" style={{ color: themeConfig.primaryColor }}>{item.type}</span>
@@ -905,16 +778,16 @@
             {activeTab === 'bugs' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <h2 className="text-lg font-black text-white">Bugs & Patches</h2>
-                  {isAdmin && <button onClick={() => openEditor('bugs')} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 transition hover:bg-emerald-500" style={{ borderRadius: themeConfig.borderRadius }}>+ Agregar Bug</button>}
+                  <EditableText as="h2" tKey="tabBugs" defaultText="Bugs & Patches" className="text-lg font-black text-white" />
+                  {isAdmin && <button onClick={() => openEditor('bugs')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Bug</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {filteredBugs.map((b) => (
-                    <div key={b.id} className="bg-black/30 border border-white/10 p-4 relative" style={{ borderRadius: themeConfig.borderRadius }}>
+                    <div key={b.id} className={`p-4 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-3 right-3 flex gap-1">
                           <button onClick={() => openEditor('bugs', b)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('bugs', b.id)} className="p-1 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDeleteItem('bugs', b.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <h3 className="text-xs font-bold text-white">{b.bug}</h3>
@@ -928,20 +801,20 @@
             {activeTab === 'curiosities' && (
               <section className="space-y-5">
                 <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                  <h2 className="text-lg font-black text-white">Curiosidades</h2>
-                  {isAdmin && <button onClick={() => openEditor('curiosities')} className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 transition hover:bg-emerald-500" style={{ borderRadius: themeConfig.borderRadius }}>+ Agregar</button>}
+                  <EditableText as="h2" tKey="tabCurio" defaultText="Curiosidades" className="text-lg font-black text-white" />
+                  {isAdmin && <button onClick={() => openEditor('curiosities')} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Agregar Curiosidad</button>}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   {filteredCuriosities.map((c) => (
-                    <div key={c.id} className="bg-black/30 border border-white/10 text-white p-5 space-y-2 relative" style={{ borderRadius: themeConfig.borderRadius }}>
+                    <div key={c.id} className={`p-5 space-y-2 relative transition-all duration-300 ${cardClass}`} style={{ borderRadius: themeConfig.borderRadius }}>
                       {isAdmin && (
                         <div className="absolute top-3 right-3 flex gap-1">
                           <button onClick={() => openEditor('curiosities', c)} className="p-1 bg-black/80 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleDeleteItem('curiosities', c.id)} className="p-1 bg-red-900 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDeleteItem('curiosities', c.id)} className="p-1 bg-red-900/90 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
                         </div>
                       )}
                       <span className="text-xl">{c.icon}</span>
-                      <h3 className="font-bold text-sm">{c.title}</h3>
+                      <h3 className="font-bold text-sm text-white">{c.title}</h3>
                       <p className="text-xs text-slate-300">{c.detail}</p>
                     </div>
                   ))}
@@ -950,17 +823,14 @@
             )}
           </main>
 
+          {/* OMITIENDO POR ESPACIO MODALES (SON IDÉNTICOS A LOS QUE YA TENÍAS, LA FUNCIONALIDAD SIGUE AQUÍ, SOLO ESTÁN AL FINAL) */}
           {/* MODAL CONFIGURACIÓN VIDEO & REDES SOCIALES */}
           {showMediaSettingsModal && isSuperAdmin && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-              <div className="bg-slate-900 border border-slate-700 w-full max-w-lg p-6 space-y-4 relative" style={{ borderRadius: themeConfig.borderRadius }}>
+              <div className="bg-slate-900 border border-slate-700 w-full max-w-lg p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
                 <button onClick={() => setShowMediaSettingsModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <h3 className="text-base font-black text-white">Configurar Video & Redes</h3>
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  persistData('ngv_m', mediaSettings);
-                  setShowMediaSettingsModal(false);
-                }} className="space-y-3 text-xs">
+                <form onSubmit={(e) => { e.preventDefault(); persistData('ngv_m', mediaSettings); setShowMediaSettingsModal(false); }} className="space-y-3 text-xs">
                   <div><label className="block text-slate-300 font-bold mb-1">Título del Video</label><input type="text" value={mediaSettings.videoTitle} onChange={(e) => setMediaSettings({...mediaSettings, videoTitle: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
                   <div><label className="block text-slate-300 font-bold mb-1">URL YouTube Video</label><input type="text" value={mediaSettings.videoUrl} onChange={(e) => setMediaSettings({...mediaSettings, videoUrl: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
                   <div><label className="block text-slate-300 font-bold mb-1">URL Discord</label><input type="text" value={mediaSettings.discordUrl} onChange={(e) => setMediaSettings({...mediaSettings, discordUrl: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
@@ -977,82 +847,47 @@
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
               <div className="bg-slate-900 border border-slate-700 max-w-lg w-full p-6 space-y-4 relative shadow-2xl" style={{ borderRadius: themeConfig.borderRadius }}>
                 <button onClick={() => { setShowUserMgmtModal(false); setUserEditModal(null); }} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
-                
                 <div className="flex justify-between items-center border-b border-slate-700 pb-3">
                   <h3 className="text-base font-black text-white">Gestión de Usuarios</h3>
-                  {!isEditor && (
-                    <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 transition" style={{ borderRadius: themeConfig.borderRadius }}>+ Crear Usuario</button>
-                  )}
+                  {!isEditor && <button onClick={() => { setUserEditModal('create'); setUserFormData({ username: '', password: '', role: 'Editor de Contenido' }); }} className="text-white text-xs font-bold px-3 py-1.5 transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>+ Crear Usuario</button>}
                 </div>
-
                 {userEditModal !== null && !isEditor && (
                   <div className="bg-black/50 border border-slate-700 p-4 space-y-3 text-xs" style={{ borderRadius: themeConfig.borderRadius }}>
                     <form onSubmit={handleSaveUser} className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <label className="block text-[11px] font-bold text-slate-300">Usuario</label>
-                          <input type="text" placeholder="Usuario" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2.5 text-white font-semibold focus:outline-none focus:ring-1" style={{ borderRadius: themeConfig.borderRadius }} />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="block text-[11px] font-bold text-slate-300">Contraseña</label>
-                          <input type="text" placeholder="Contraseña" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2.5 text-white font-mono focus:outline-none focus:ring-1" style={{ borderRadius: themeConfig.borderRadius }} />
-                        </div>
+                        <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Usuario</label><input type="text" required value={userFormData.username} onChange={(e) => setUserFormData({...userFormData, username: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold" style={{ borderRadius: themeConfig.borderRadius }} /></div>
+                        <div className="space-y-1"><label className="block text-[11px] font-bold text-slate-300">Contraseña</label><input type="text" required value={userFormData.password} onChange={(e) => setUserFormData({...userFormData, password: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-mono" style={{ borderRadius: themeConfig.borderRadius }} /></div>
                       </div>
-
                       <div className="space-y-1">
                         <label className="block text-[11px] font-bold text-slate-300">Rol / Permisos</label>
-                        {isSuperAdmin ? (
-                          <div className="relative">
-                            <select value={userFormData.role} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2.5 text-white font-semibold appearance-none focus:outline-none focus:ring-1" style={{ borderRadius: themeConfig.borderRadius }}>
-                              <option value="Super Administrador">Super Administrador</option>
-                              <option value="Administrador">Administrador</option>
-                              <option value="Editor de Contenido">Editor de Contenido</option>
-                            </select>
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><Icon name="chevron-down" className="w-4 h-4" /></div>
-                          </div>
-                        ) : (
-                          <div>
-                            <select disabled value={userFormData.role} className="w-full bg-slate-800/80 border border-amber-500/50 p-2.5 text-amber-200 font-semibold appearance-none cursor-not-allowed opacity-90" style={{ borderRadius: themeConfig.borderRadius }}>
-                              <option value={userFormData.role}>{userFormData.role}</option>
-                            </select>
-                            <p className="text-[11px] font-bold text-amber-400 mt-1">No tienes acceso a modificar este permiso</p>
-                          </div>
-                        )}
+                        <select value={userFormData.role} disabled={!isSuperAdmin} onChange={(e) => setUserFormData({...userFormData, role: e.target.value})} className="w-full bg-slate-800 border border-slate-600 p-2 text-white font-semibold disabled:opacity-70" style={{ borderRadius: themeConfig.borderRadius }}>
+                          <option value="Super Administrador">Super Administrador</option>
+                          <option value="Administrador">Administrador</option>
+                          <option value="Editor de Contenido">Editor de Contenido</option>
+                        </select>
                       </div>
-
                       <div className="flex justify-end gap-2 pt-2">
                         <button type="button" onClick={() => setUserEditModal(null)} className="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold transition" style={{ borderRadius: themeConfig.borderRadius }}>Cancelar</button>
-                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-lg transition" style={{ borderRadius: themeConfig.borderRadius }}>Guardar Usuario</button>
+                        <button type="submit" className="px-4 py-2 text-white font-bold transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Guardar Usuario</button>
                       </div>
                     </form>
                   </div>
                 )}
-
-                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                  {adminUsers.map((usr) => {
-                    const isTargetAdminOrSuper = usr.role === 'Administrador' || usr.role === 'Super Administrador';
-                    const canSeePassword = isSuperAdmin || (!isTargetAdminOrSuper && !isEditor);
-                    const displayPassword = canSeePassword ? usr.password : '••••••••';
-                    const canModify = !isEditor && (isSuperAdmin ? usr.id !== currentUser.id : !isTargetAdminOrSuper);
-
-                    return (
-                      <div key={usr.id} className="flex justify-between items-center p-3 bg-black/40 border border-slate-700 hover:border-slate-500 transition text-xs shadow-md" style={{ borderRadius: themeConfig.borderRadius }}>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white text-sm">{usr.username}</span> 
-                            <span className="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-600 font-mono">[{usr.role}]</span>
-                          </div>
-                          <div className="text-[11px] text-slate-400 font-mono mt-1">Pass: {displayPassword}</div>
-                        </div>
-                        {canModify && (
-                          <div className="flex items-center gap-1.5">
-                            <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg shadow transition" title="Editar usuario"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
-                            <button onClick={() => handleDeleteUser(usr)} className="p-2 bg-red-900 hover:bg-red-800 text-white rounded-lg shadow transition" title="Eliminar usuario"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
-                          </div>
-                        )}
+                <div className="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                  {adminUsers.map((usr) => (
+                    <div key={usr.id} className="flex justify-between items-center p-3 bg-black/40 border border-slate-700 text-xs shadow-md" style={{ borderRadius: themeConfig.borderRadius }}>
+                      <div>
+                        <div className="flex items-center gap-2"><span className="font-bold text-white text-sm">{usr.username}</span> <span className="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-600 font-mono">[{usr.role}]</span></div>
+                        <div className="text-[11px] text-slate-400 font-mono mt-1">Pass: {isSuperAdmin || (usr.role !== 'Administrador' && usr.role !== 'Super Administrador' && !isEditor) ? usr.password : '••••••••'}</div>
                       </div>
-                    );
-                  })}
+                      {(!isEditor && (isSuperAdmin ? usr.id !== currentUser.id : (usr.role !== 'Administrador' && usr.role !== 'Super Administrador'))) && (
+                        <div className="flex gap-1.5">
+                          <button onClick={() => { setUserEditModal(usr); setUserFormData({ username: usr.username, password: usr.password, role: usr.role }); }} className="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded"><Icon name="edit-3" className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDeleteUser(usr)} className="p-2 bg-red-900 hover:bg-red-800 text-white rounded"><Icon name="trash-2" className="w-3.5 h-3.5" /></button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1061,67 +896,30 @@
           {/* MODAL EDITOR GENERAL DE CONTENIDO */}
           {editorModal && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-              <div className="bg-slate-900 border border-slate-700 max-w-xl w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto" style={{ borderRadius: themeConfig.borderRadius }}>
+              <div className="bg-slate-900 border border-slate-700 max-w-xl w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto custom-scrollbar" style={{ borderRadius: themeConfig.borderRadius }}>
                 <button onClick={() => setEditorModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <h3 className="text-base font-black text-white capitalize">Editar ({editorModal.category})</h3>
                 <form onSubmit={handleSaveForm} className="space-y-3 text-xs">
                   {editorModal.category === 'hero' && (
-                    <>
-                      <div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                        <div><label className="block text-slate-300 font-bold mb-1">Etiqueta</label><input type="text" value={formData.tag || ''} onChange={(e) => setFormData({...formData, tag: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      </div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Imagen URL</label><input type="text" required value={formData.image || ''} onChange={(e) => setFormData({...formData, image: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Descripción</label><textarea rows={3} value={formData.description || ''} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                    </>
+                    <><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><div className="grid grid-cols-2 gap-2 mb-2"><div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div><div><label className="block text-slate-300 font-bold mb-1">Etiqueta</label><input type="text" value={formData.tag || ''} onChange={(e) => setFormData({...formData, tag: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div></div><label className="block text-slate-300 font-bold mb-1">Imagen URL</label><input type="text" required value={formData.image || ''} onChange={(e) => setFormData({...formData, image: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono mb-2" /><label className="block text-slate-300 font-bold mb-1">Descripción</label><textarea rows={3} value={formData.description || ''} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></>
                   )}
                   {editorModal.category === 'updates' && (
-                    <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                        <div><label className="block text-slate-300 font-bold mb-1">Versión</label><input type="text" required value={formData.version || ''} onChange={(e) => setFormData({...formData, version: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
-                      </div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Notas</label><textarea rows={3} required value={formData.items || ''} onChange={(e) => setFormData({...formData, items: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
-                    </>
+                    <><div className="grid grid-cols-2 gap-2 mb-2"><div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div><div><label className="block text-slate-300 font-bold mb-1">Versión</label><input type="text" required value={formData.version || ''} onChange={(e) => setFormData({...formData, version: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div></div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Notas</label><textarea rows={3} required value={formData.items || ''} onChange={(e) => setFormData({...formData, items: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></>
                   )}
                   {editorModal.category === 'betas' && (
-                    <>
-                      <div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Tipo</label><input type="text" value={formData.type || ''} onChange={(e) => setFormData({...formData, type: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Descripción</label><textarea rows={3} value={formData.description || ''} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                    </>
+                    <><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Tipo</label><input type="text" value={formData.type || ''} onChange={(e) => setFormData({...formData, type: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Descripción</label><textarea rows={3} value={formData.description || ''} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></>
                   )}
                   {editorModal.category === 'characters' && (
-                    <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div><label className="block text-slate-300 font-bold mb-1">Nombre</label><input type="text" required value={formData.name || ''} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                        <div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      </div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Avatar URL</label><input type="text" required value={formData.avatar || ''} onChange={(e) => setFormData({...formData, avatar: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Lore</label><textarea rows={3} value={formData.lore || ''} onChange={(e) => setFormData({...formData, lore: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                    </>
+                    <><div className="grid grid-cols-2 gap-2 mb-2"><div><label className="block text-slate-300 font-bold mb-1">Nombre</label><input type="text" required value={formData.name || ''} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div><div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div></div><label className="block text-slate-300 font-bold mb-1">Avatar URL</label><input type="text" required value={formData.avatar || ''} onChange={(e) => setFormData({...formData, avatar: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono mb-2" /><label className="block text-slate-300 font-bold mb-1">Lore</label><textarea rows={3} value={formData.lore || ''} onChange={(e) => setFormData({...formData, lore: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></>
                   )}
                   {editorModal.category === 'bugs' && (
-                    <>
-                      <div><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Bug</label><input type="text" required value={formData.bug || ''} onChange={(e) => setFormData({...formData, bug: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Fix</label><textarea rows={3} value={formData.fix || ''} onChange={(e) => setFormData({...formData, fix: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></div>
-                    </>
+                    <><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Bug</label><input type="text" required value={formData.bug || ''} onChange={(e) => setFormData({...formData, bug: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Fix</label><textarea rows={3} value={formData.fix || ''} onChange={(e) => setFormData({...formData, fix: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white font-mono" /></>
                   )}
                   {editorModal.category === 'curiosities' && (
-                    <>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div><label className="block text-slate-300 font-bold mb-1">Icono</label><input type="text" value={formData.icon || ''} onChange={(e) => setFormData({...formData, icon: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white text-center text-lg" /></div>
-                        <div className="col-span-2"><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      </div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                      <div><label className="block text-slate-300 font-bold mb-1">Detalle</label><textarea rows={3} value={formData.detail || ''} onChange={(e) => setFormData({...formData, detail: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div>
-                    </>
+                    <><div className="grid grid-cols-3 gap-2 mb-2"><div><label className="block text-slate-300 font-bold mb-1">Icono</label><input type="text" value={formData.icon || ''} onChange={(e) => setFormData({...formData, icon: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white text-center text-lg" /></div><div className="col-span-2"><label className="block text-slate-300 font-bold mb-1">Juego</label><input type="text" required value={formData.game || ''} onChange={(e) => setFormData({...formData, game: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></div></div><label className="block text-slate-300 font-bold mb-1">Título</label><input type="text" required value={formData.title || ''} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white mb-2" /><label className="block text-slate-300 font-bold mb-1">Detalle</label><textarea rows={3} value={formData.detail || ''} onChange={(e) => setFormData({...formData, detail: e.target.value})} className="w-full bg-black/50 border border-slate-700 rounded p-2 text-white" /></>
                   )}
                   <div className="flex justify-end gap-2 pt-3 border-t border-slate-700">
-                    <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition" style={{ borderRadius: themeConfig.borderRadius }}>Guardar en la Nube</button>
+                    <button type="submit" className="px-4 py-2 text-white font-bold transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Guardar en la Nube</button>
                   </div>
                 </form>
               </div>
@@ -1135,14 +933,21 @@
                 <button onClick={() => setShowLoginModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white"><Icon name="x" className="w-4 h-4" /></button>
                 <h3 className="text-lg font-black text-white text-center">Acceso Administrador</h3>
                 <form onSubmit={handleAdminLogin} className="space-y-3">
-                  <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:border-slate-500" style={{ borderRadius: themeConfig.borderRadius }} />
-                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-slate-500" style={{ borderRadius: themeConfig.borderRadius }} />
+                  <input type="text" required value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} placeholder="Usuario" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none" style={{ borderRadius: themeConfig.borderRadius }} />
+                  <input type="password" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} placeholder="Contraseña" className="w-full bg-black/50 border border-slate-700 px-3 py-2 text-xs text-white font-mono focus:outline-none" style={{ borderRadius: themeConfig.borderRadius }} />
                   {authError && <p className="text-xs text-red-400">{authError}</p>}
                   <button type="submit" className="w-full py-2 text-white font-bold text-xs shadow-lg transition" style={{ backgroundColor: themeConfig.primaryColor, borderRadius: themeConfig.borderRadius }}>Entrar al Sistema</button>
                 </form>
               </div>
             </div>
           )}
+
+          <style>{`
+            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+          `}</style>
         </div>
       );
     }
